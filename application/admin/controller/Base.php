@@ -14,7 +14,7 @@ class Base extends Controller
     const WEBSITE_CONFIG_PATH = CONFIG_PATH . 'website_config.json';
 
     protected $middleware = [
-//        AdminLoginCheck::class,
+        AdminLoginCheck::class,
     ];
 
     /**

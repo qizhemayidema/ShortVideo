@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>登录</title>
+    <link href="__STATIC__/css/bootstrap.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/animate.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.css" rel="stylesheet">
+    <link href="__STATIC__/css/login.css" rel="stylesheet">
+    <script src="__STATIC__/js/jquery.min.js"></script>
+    <script src="__STATIC__/js/plugins/layer/layer.min.js"></script>
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <script>
+        if (window.top !== window.self) {
+            window.top.location = window.location;
+        }
+    </script>
+
+</head>
+
+<body class="signin">
+<div class="signinpanel">
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="signin-info">
+                <div class="logopanel m-b">
+                    <h1></h1>
+                </div>
+                <div class="m-b"></div>
+                <h4></h4>
+                <ul class="m-b">
+                </ul>
+                <strong></strong>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <form method="post" action="/">
+                <!--<h4 class="no-margins">登录：</h4>-->
+                <p class="m-t-md">欢迎登陆</p>
+                <input type="text" name="username" class="form-control uname" placeholder="用户名" />
+                <input type="password" name="password" class="form-control pword m-b" placeholder="密码" />
+                <input type="text" name="captcha" class="form-control pword"  placeholder="验证码" />
+                <img src="{:captcha_src()}" onclick="this.src = '{:captcha_src()}?random='+Math.random()" alt="" style="margin-top:15px;width: 230px;">
+                <button class="btn btn-success btn-block">登录</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+    $(function(){
+        $('form').submit(function(){
+            data = new FormData($('form')[0]);
+            $.ajax({
+                url:"{:url('admin/Login/check')}",
+                type:'post',
+                dataType:'json',
+                data:data,
+                processData:false,
+                contentType:false,
+                success:function(data){
+                    if (data.code == 0){
+                        layer.msg(data.msg);
+                    } else{
+                        location.href="{:url('admin/Index/index')}";
+                    }
+                }
+            })
+            return false;
+        })
+    })
+</script>
+</html>
