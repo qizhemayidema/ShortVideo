@@ -1,0 +1,62 @@
+{include file="common/source"}
+<div class="col-sm-12">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>
+                <button type="button" onclick="window.location.href='{:url('/admin/Video_cate/add')}'"
+                        class="btn btn-w-m btn-primary">添加分类
+                </button>
+            </h5>
+        </div>
+        <div class="ibox-content">
+            <div class="example">
+
+                <table class="table table-bordered table-hover text-center">
+                    <thead>
+                    <tr class="text-center">
+                        <th style="text-align: center;">分类名称</th>
+                        <th style="text-align: center;">排序</th>
+                        <th style="text-align: center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach $cate as $key => $value}
+                    <tr>
+                        <td style="text-align: left;">{$value.name}</td>
+                        <td>{$value.order_num}</td>
+                        <td>
+                            <button onclick="window.location.href='{:url('admin/Video_cate/edit',['cate_id'=>$value.id])}'" class="btn btn-info" type="button"><i class="fa fa-paste"></i> 编辑</button>
+                            <button onclick="removeArticle(this,'{$value.id}')" class="btn btn-danger" type="button"><i class="fa fa-remove"></i> <span class="bold">删除</span></button>
+                        </td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+
+    var removeArticle = function (_this, article_id) {
+        $.ajax({
+            url: "{:url('admin/Video_cate/delete')}",
+            type: 'post',
+            dataType: 'json',
+            data:{
+                cate_id : article_id,
+            },
+            success: function (data) {
+                console.log(data)
+                if (data.code == 0) {
+                    layer.msg(data.msg,{icon: 5})
+                } else {
+                    layer.msg('删除成功',{icon : 1})
+                    $(_this).parents('tr').remove();
+                }
+
+            }
+        })
+    }
+</script>

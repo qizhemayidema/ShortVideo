@@ -1,0 +1,54 @@
+{include file="common/source"}
+<div class="col-sm-12">
+    <div class="ibox-content">
+        <form action="" class="form-horizontal">
+            {:token()}
+            <input type="hidden" name="id" value="{$cate.id}">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">分类名称</label>
+                <div class="col-sm-8">
+                    <input name="name" value="{$cate.name}" required  type="text" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">排序数字</label>
+                <div class="col-sm-8">
+                    <input name="order_num" value="{$cate.order_num}" required placeholder="从0开始,越大顺序越靠前,最大999" type="text" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label"></label>
+                <div class="col-sm-5">
+                    <button type="button" class="btn btn-w-m btn-success" onclick="save()">编辑</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+
+    var save = function () {
+        var formData = new FormData($('form')[0]);
+
+        $.ajax({
+            url: "{:url('admin/Video_cate/update')}",
+            type: 'post',
+            dataType: 'json',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data.code == 0) {
+                    layer.msg(data.msg, {icon: 5})
+                } else {
+                    layer.msg('修改成功', {icon: 1});
+                    setTimeout(function () {
+                        window.location.href = "{:url('admin/Video_cate/index')}";
+                    }, 600)
+                }
+            }
+        })
+    }
+</script>
