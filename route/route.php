@@ -10,3 +10,12 @@
 // +----------------------------------------------------------------------
 
 use think\facade\Route;
+
+
+Route::group('api',function(){
+    Route::group('video',function(){
+        Route::group('comment',function(){
+            Route::post('/','api/Comment/videoSave')->name('api.comment.video_save');
+        });
+    });
+});
