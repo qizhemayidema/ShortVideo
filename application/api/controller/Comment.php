@@ -5,13 +5,12 @@ namespace app\api\controller;
 use app\common\model\User as UserModel;
 use app\common\typeCode\history\Video as VideoHistory;
 use think\Controller;
-use think\Exception;
 use think\Request;
 use think\Validate;
 use app\common\model\Video as VideoModel;
 use app\common\model\Message as MessageModel;
 
-class Comment extends Controller
+class Comment extends Base
 {
     public $user_id = 1;
 
@@ -55,7 +54,7 @@ class Comment extends Controller
         $commentModel->startTrans();
         try{
             //step3 : 准备数据 入库
-            $user = $userModel->find($this->user_id);
+            $user = $this->userInfo;
             $insert = [
                 'type'  => 1,
                 'public_id' => $post['video_id'],
@@ -69,8 +68,13 @@ class Comment extends Controller
 
             //如果是不是顶级评论节点则增加顶级节点的被评论数
             if (isset($post['comment_id'])){
+                $comment = $commentModel->receptionShowData()->find($post['comment_id']);
+
+                if (!$comment) return json(['code'=>0,'msg'=>'操作太快了,休息一下吧']);
+
                 $insert['top_id'] = $post['comment_id'];
-                $commentModel->where(['id'=>$post['comment_id']])->setInc('comment_sum');
+
+                $comment->setInc('comment_sum');
             }
 
             //如果有回复到用户,则记录,如果没有,则表明直接回复的顶级节点

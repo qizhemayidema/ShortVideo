@@ -1,0 +1,136 @@
+{include file="common/source"}
+<div class="col-sm-12">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>
+                <!--<button type="button" onclick="window.location.href='{:url('/admin/Video/add')}'"-->
+                <!--class="btn btn-w-m btn-primary">添加视频-->
+                <!--</button>-->
+            </h5>
+        </div>
+        <div class="ibox-content">
+            <div class="example">
+
+                <table class="table table-bordered table-hover text-center">
+                    <thead>
+                    <tr class="text-center">
+                        <th style="text-align: center;">举报人</th>
+                        <th style="text-align: center;">被举报</th>
+                        <th style="text-align: center;">举报类型</th>
+                        <th style="text-align: center;">描述</th>
+                        <th style="text-align: center;">时间</th>
+                        <th style="text-align: center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach $video as $key => $value}
+                    <tr>
+                        <td>{$value.cate_name}</td>
+                        <td>{$value->title}</td>
+                        <td><img src="{$value->video_pic}" alt="" style="width: 75px;"></td>
+
+                        <td>{$value.ok_sum}</td>
+                        <td>{$value.no_sum}</td>
+                        <td class="status">
+                            {if $value->status == 0}
+                            <a href="javascript:void(0);" onclick="checkStatus(this,0,'{$value->id}')">
+                                <p><span class="label label-danger">封禁</span></p>
+                            </a>
+                            {elseif $value->status == 1}
+                            <a href="javascript:void(0);" onclick="checkStatus(this,1,'{$value->id}')">
+                                <p><span class="label label-info">未审核</span></p>
+                            </a>
+                            {elseif $value->status == 2}
+                            <a href="javascript:void(0);" onclick="checkStatus(this,2,'{$value->id}')">
+                                <p><span class="label label-success">审核通过</span></p>
+                            </a>
+                            {/if}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">审核 <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="javascript:void(0);" onclick="checkStatus(this,0,'{$value->id}')">封禁</a>
+                                    </li>
+                                    <li><a href="javascript:void(0);" onclick="checkStatus(this,1,'{$value->id}')">未审核</a>
+                                    </li>
+                                    <li><a href="javascript:void(0);" onclick="checkStatus(this,2,'{$value->id}')">审核通过</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button onclick="window.location.href='{:url('admin/Video/info')}?id={$value->id}'" class="btn btn-info" type="button"> <span class="bold">详情</span></button>
+
+                            <button onclick="removeArticle(this,'{$value->id}')" class="btn btn-danger" type="button"><i class="fa fa-remove"></i> <span class="bold">删除</span></button>
+                        </td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center;">
+                {$video->render()|raw}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    checkStatus = function(_this,status,article_id) {
+        $.ajax({
+            url: "{:url('admin/Video/changeStatus')}",
+            type: 'post',
+            dataType: 'json',
+            data:{
+                video_id : article_id,
+                status : status,
+            },
+            success: function (data) {
+                if (data.code == 0) {
+                    layer.msg(data.msg,{icon: 5})
+                } else {
+                    layer.msg('修改成功')
+                    let str = ``
+                    if (status == 0){
+                        str = `<a href="javascript:void(0);" onclick="checkStatus(this,0,'${article_id}')">
+                                   <p><span class="label label-danger">封禁</span></p>
+                            </a>`
+                    } else if(status == 1){
+                        str = `<a href="javascript:void(0);" onclick="checkStatus(this,1,'${article_id}')">
+                             <p><span class="label label-info">未审核</span></p>
+                            </a>`
+                    } else if(status == 2){
+                        str = `<a href="javascript:void(0);" onclick="checkStatus(this,2,'${article_id}')">
+                              <p><span class="label label-success">审核通过</span></p>
+
+                            </a>`
+                    }
+                    $('.status').html(str)
+                }
+            }
+        })
+    }
+
+
+    var removeArticle = function (_this, article_id) {
+        layer.confirm('您确定删除吗',function(){
+            $.ajax({
+                url: "{:url('admin/Video/delete')}",
+                type: 'post',
+                dataType: 'json',
+                data:{
+                    id : article_id,
+                },
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.msg(data.msg,{icon: 5})
+                    } else {
+                        layer.msg('删除成功',{icon : 1})
+                        $(_this).parents('tr').remove();
+                    }
+                }
+            })
+        })
+
+    }
+</script>

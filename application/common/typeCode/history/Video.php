@@ -12,6 +12,7 @@ use app\common\typeCode\impl\HistoryImpl;
 class Video implements HistoryImpl
 {
     private $type = 2;
+
     public function getType(): int
     {
         // TODO: Implement getType() method.
