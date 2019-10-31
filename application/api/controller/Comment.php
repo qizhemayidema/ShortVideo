@@ -3,8 +3,7 @@
 namespace app\api\controller;
 
 use app\common\model\User as UserModel;
-use app\common\typeCode\history\Video as VideoHistory;
-use think\Controller;
+use app\common\typeCode\message\VideoComment as VideoHistory;
 use think\Request;
 use think\Validate;
 use app\common\model\Video as VideoModel;
@@ -88,7 +87,7 @@ class Comment extends Base
             $videoModel->where(['id'=>$post['video_id']])->setInc('comment_sum');
 
             //发送消息到本人
-            (new MessageModel())->send($videoData['user_id'],(new VideoHistory())->getType());
+            (new MessageModel())->send((new VideoHistory()),$videoData['user_id']);
 
             $commentModel->commit();
         }catch (\Exception $e){

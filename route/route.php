@@ -17,5 +17,9 @@ Route::group('api',function(){
         Route::group('comment',function(){
             Route::post('/','api/Comment/videoSave')->name('api.comment.video_save');
         });
+
+        Route::group('like',function(){
+            Route::post('/','api/Video/likeSave')->name('api.video.likeSave');
+        });
     });
 });

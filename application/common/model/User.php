@@ -16,12 +16,12 @@ class User extends Model implements ShowImpl
         $this->where(['id'=>$user_id])->update(['status'=>$new_status]);
     }
 
-    public function backgroundShowData(string $alias)
+    public function backgroundShowData(string $alias = '')
     {
         return $this;
     }
 
-    public function receptionShowData(string $alias)
+    public function receptionShowData(string $alias = '')
     {
         // TODO: Implement receptionShowData() method.
         $status = $alias ? $alias.'.status' : 'status';
