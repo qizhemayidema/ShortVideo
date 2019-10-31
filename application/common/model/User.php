@@ -7,6 +7,10 @@ use think\Model;
 
 class User extends Model implements ShowImpl
 {
+    public function existsUser($user_id){
+        return $this->find($user_id);
+    }
+
     public function UpdateStatus($user_id)
     {
         $user = $this->where(['id'=>$user_id])->find();

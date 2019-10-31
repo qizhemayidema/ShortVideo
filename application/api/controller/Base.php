@@ -22,25 +22,23 @@ class Base extends Controller
         $this->getUserInfo();
 
     }
+
     protected function getUserInfo()
     {
         $token = \request()->param('token');
         if ($token) {
-            $this->userInfo = (new UserModel())->receptionShowData()->where(['token'=>$token])->find();
+            $this->userInfo = (new UserModel())->receptionShowData()->where(['token' => $token])->find();
         }
     }
 
     public function __get($name)
     {
         // TODO: Implement __get() method.
-        if ($name == 'userInfo'){
+        if ($name == 'userInfo') {
             if (!$this->$name) {
-                if (\request()->isAjax()){
-                    header('Content-type: application/json');
-                    exit(json_encode(['code' => 0, 'msg' => '请先登录账号~'], 256));
-                }else{
-                    return $this->redirect('index/Index/index');
-                }
+                header('Content-type: application/json');
+                exit(json_encode(['code' => 0, 'msg' => '请先登录账号~'], 256));
+
             }
             return $this->$name;
         }
@@ -53,7 +51,7 @@ class Base extends Controller
      */
     protected function getConfig($name)
     {
-        if (!$this->configObject){
+        if (!$this->configObject) {
             $this->configObject = json_decode(file_get_contents(self::WEB_SITE_PATH));
         }
         $configPath = explode('.', $name);
@@ -67,7 +65,7 @@ class Base extends Controller
             header('Content-type: application/json');
             exit(json_encode(['code' => 0, 'msg' => '获取配置失败'], 256));
         }
-        $temp = json_decode(json_encode($temp,256),true);
+        $temp = json_decode(json_encode($temp, 256), true);
         return $temp;
     }
 

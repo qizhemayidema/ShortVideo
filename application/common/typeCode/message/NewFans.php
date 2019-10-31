@@ -2,21 +2,22 @@
 /**
  * Created by PhpStorm.
  * User: 刘彪
- * Date: 2019/10/29
- * Time: 18:29
+ * Date: 2019/10/31
+ * Time: 13:33
  */
+
 namespace app\common\typeCode\message;
+
 
 use app\common\typeCode\impl\MessageImpl;
 
-class VideoComment implements MessageImpl
+//新粉
+class NewFans implements MessageImpl
 {
-    private $type = 2;
+    private $type = 4;
 
     public function getType(): int
     {
-        // TODO: Implement getType() method.
         return $this->type;
-
     }
 }

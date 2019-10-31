@@ -3,11 +3,14 @@
 namespace app\api\controller;
 
 use app\common\model\User as UserModel;
-use app\common\typeCode\message\VideoComment as VideoHistory;
+use app\common\typeCode\message\VideoComment as VideoCommentMessage;
 use think\Request;
 use think\Validate;
 use app\common\model\Video as VideoModel;
 use app\common\model\Message as MessageModel;
+use app\common\model\History as HistoryModel;
+use app\common\model\Comment as CommentModel;
+use app\common\typeCode\history\CommentLike as CommentLikeHistory;
 
 class Comment extends Base
 {
@@ -47,7 +50,7 @@ class Comment extends Base
             return json(['code'=>0,'msg'=>'此视频已无法评论']);
         }
 
-        $commentModel = (new \app\common\model\Comment());
+        $commentModel = new CommentModel();
         $userModel = new UserModel();
 
         $commentModel->startTrans();
@@ -87,12 +90,62 @@ class Comment extends Base
             $videoModel->where(['id'=>$post['video_id']])->setInc('comment_sum');
 
             //发送消息到本人
-            (new MessageModel())->send((new VideoHistory()),$videoData['user_id']);
+            (new MessageModel())->send((new VideoCommentMessage()),$videoData['user_id']);
 
             $commentModel->commit();
         }catch (\Exception $e){
             $commentModel->rollback();
             return json(['code'=>0,'msg'=>'系统错误,请稍后再试']);
+        }
+
+        return json(['code'=>1,'msg'=>'success']);
+    }
+
+    //点赞一个评论
+    public function likeSave(Request $request)
+    {
+        $post = $request->post();
+
+        $user = $this->userInfo;
+
+        $rules = [
+            'token' => 'require',
+            'comment_id' => 'require',
+        ];
+
+        $message = [
+            'token.require' => 'token不合法',
+            'token.comment_id' => 'comment_id不合法',
+        ];
+
+        $validate = new Validate($rules,$message);
+
+        if (!$validate->check($post)) return json(['code'=>0,'msg'=>$validate->getError()]);
+
+        $historyModel = new HistoryModel();
+        $commentLikeHistory = new CommentLikeHistory();
+        $commentModel = new CommentModel();
+
+        //检查是否点过赞了
+        $history = $historyModel->existsHistory($commentLikeHistory,$user->id,$post['comment_id']);
+
+        if ($history) return json(['code'=>0,'msg'=>'您已经点过赞了,不能重复点赞哦']);
+
+        $commentModel->startTrans();
+        try {
+
+            //评论加赞
+            (new CommentModel())->where(['id'=>$post['comment_id']])->setInc('like_sum');
+
+            //记录历史
+            $historyModel->add($commentLikeHistory,$user->id,$post['comment_id']);
+
+            //不通知用户
+
+            $commentModel->commit();
+        }catch(\Exception $e){
+            $commentModel->rollback();
+            return json(['code'=>0,'msg'=>'点赞失败']);
         }
 
         return json(['code'=>1,'msg'=>'success']);
