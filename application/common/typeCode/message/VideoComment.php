@@ -17,6 +17,5 @@ class VideoComment implements MessageImpl
     {
         // TODO: Implement getType() method.
         return $this->type;
-
     }
 }

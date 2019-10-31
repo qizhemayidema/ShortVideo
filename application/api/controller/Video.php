@@ -74,4 +74,6 @@ class Video extends Base
 
         return json(['code'=>1,'msg'=>'success']);
     }
+
+
 }

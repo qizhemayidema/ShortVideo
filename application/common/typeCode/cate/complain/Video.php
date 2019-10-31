@@ -14,7 +14,7 @@ use app\common\typeCode\impl\CateImpl;
 
 class Video implements CateImpl,TypeImpl
 {
-    private $type = 2;  //举报本身的类型
+    private $type = 1;  //举报本身的类型
 
     private $cateType = 2;
 
