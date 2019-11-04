@@ -69,4 +69,11 @@ class Base extends Controller
         return $temp;
     }
 
+    protected function existsToken()
+    {
+        $token = Request()->param('token');
+
+        return  $token ?? false;
+    }
+
 }

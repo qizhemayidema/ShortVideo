@@ -13,4 +13,6 @@ interface CateImpl
 
     public function getCateCacheName() :string ;    //获取分类缓存名
 
+    public function getLevelType(): string;     //获取层级类型 one | more 两个值
+
 }

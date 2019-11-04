@@ -12,18 +12,28 @@ class VideoCate extends Base
 {
     public function index()
     {
+
         $categoryModel = new CategoryModel();
+
         $cate = $categoryModel->getList((new VideoCateType()));
 
         $this->assign('cate',$cate);
 
         return $this->fetch();
+
     }
 
     public function add()
     {
 
+        $categoryModel = new CategoryModel();
+
+        $cate = $categoryModel->getList((new VideoCateType()));
+
+        $this->assign('cate',$cate);
+
         return $this->fetch();
+
     }
 
     public function save(Request $request)
@@ -33,6 +43,7 @@ class VideoCate extends Base
         $rules = [
             'name'  => 'require|max:60',
             'order_num' => 'require|between:0,999',
+            'p_id'      => 'require',
             '__token__'     => 'token',
         ];
 
@@ -41,6 +52,7 @@ class VideoCate extends Base
             'name.max'      => '名称最大60个字符',
             'order_num.require' => '排序必须填写',
             'order_num.between' => '排序数字最小为0,最大为999',
+            'p_id.require'  => '所属分类必须填写',
             '__token__.token'   => '不能重复提交'
         ];
 
@@ -54,6 +66,7 @@ class VideoCate extends Base
         $insert = [
             'type'  => $videoType->getCateType(),
             'name'  => $data['name'],
+            'p_id'  => $data['p_id'],
             'order_num' => $data['order_num'],
         ];
 
@@ -68,6 +81,12 @@ class VideoCate extends Base
         $cate_id = $request->param('cate_id');
         $cate = CategoryModel::find($cate_id);
 
+        $categoryModel = new CategoryModel();
+
+        $list = $categoryModel->getList((new VideoCateType()));
+
+        $this->assign('list',$list);
+
         $this->assign('cate',$cate);
 
         return $this->fetch();
@@ -81,6 +100,7 @@ class VideoCate extends Base
             'id'        => 'require',
             'name'  => 'require|max:60',
             'order_num' => 'require|between:0,999',
+            'p_id'  => 'require',
             '__token__'     => 'token',
         ];
 
@@ -89,6 +109,7 @@ class VideoCate extends Base
             'name.max'      => '名称最大60个字符',
             'order_num.require' => '排序必须填写',
             'order_num.between' => '排序数字最小为0,最大为999',
+            'p_id.require'  => '所属分类必须填写',
             '__token__.token'   => '不能重复提交'
         ];
 
@@ -99,6 +120,7 @@ class VideoCate extends Base
         $update = [
             'name'  => $data['name'],
             'order_num' => $data['order_num'],
+            'p_id'  => $data['p_id'],
         ];
 
         $cateModel = new CategoryModel();

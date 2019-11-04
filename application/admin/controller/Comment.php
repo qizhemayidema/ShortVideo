@@ -11,6 +11,9 @@ class Comment extends Base
 {
     public function index()
     {
+        $res = (new CommentModel())->getList((new VideoType()),0,10,'',1);
+
+
         $list = (new CommentModel())->backgroundShowData()->where('top_id',0)
             ->order('create_time','desc')->paginate(15);
 

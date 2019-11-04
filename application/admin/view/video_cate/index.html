@@ -29,7 +29,18 @@
                             <button onclick="removeArticle(this,'{$value.id}')" class="btn btn-danger" type="button"><i class="fa fa-remove"></i> <span class="bold">删除</span></button>
                         </td>
                     </tr>
+                    {foreach $value['child'] as $key1 => $value1}
+                    <tr>
+                        <td style="text-align: left;">--{$value1.name}</td>
+                        <td>{$value1.order_num}</td>
+                        <td>
+                            <button onclick="window.location.href='{:url('admin/Video_cate/edit',['cate_id'=>$value1.id])}'" class="btn btn-info" type="button"><i class="fa fa-paste"></i> 编辑</button>
+                            <button onclick="removeArticle(this,'{$value1.id}')" class="btn btn-danger" type="button"><i class="fa fa-remove"></i> <span class="bold">删除</span></button>
+                        </td>
+                    </tr>
                     {/foreach}
+                    {/foreach}
+
                     </tbody>
                 </table>
             </div>

@@ -18,6 +18,8 @@ class Video implements CateImpl,TypeImpl
 
     private $cateType = 2;
 
+    private $levelType = 'one';
+
     private $cateCacheName = "complain_video_type";
 
 
@@ -37,5 +39,12 @@ class Video implements CateImpl,TypeImpl
     {
 
         return $this->cateCacheName;
+    }
+
+    public function getLevelType(): string
+    {
+        // TODO: Implement getLevelType() method.
+
+        return $this->levelType;
     }
 }

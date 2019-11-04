@@ -11,16 +11,12 @@ use app\common\model\Message as MessageModel;
 use app\common\model\History as HistoryModel;
 use app\common\model\Comment as CommentModel;
 use app\common\typeCode\history\CommentLike as CommentLikeHistory;
+use app\common\typeCode\history\VideoComment as VideoCommentHistory;
+
 
 class Comment extends Base
 {
     public $user_id = 1;
-
-    //
-    public function lists()
-    {
-
-    }
 
     //评论一个视频
     public function videoSave(Request $request)
@@ -52,6 +48,8 @@ class Comment extends Base
 
         $commentModel = new CommentModel();
         $userModel = new UserModel();
+        $historyModel = new HistoryModel();
+        $videoCommentHistory = new VideoCommentHistory();
 
         $commentModel->startTrans();
         try{
@@ -89,9 +87,13 @@ class Comment extends Base
             //更改视频被评论数
             $videoModel->where(['id'=>$post['video_id']])->setInc('comment_sum');
 
+            //判断用户是不是 首次评论
+            if(!$historyModel->existsHistory($videoCommentHistory,$user->id)){
+                $historyModel->add($videoCommentHistory,$user->id,$commentModel->getLastInsID());
+                $userModel->incScore($user->id,$this->getConfig('assignment_score.first_comment'));
+            }
             //发送消息到本人
             (new MessageModel())->send((new VideoCommentMessage()),$videoData['user_id']);
-
             $commentModel->commit();
         }catch (\Exception $e){
             $commentModel->rollback();

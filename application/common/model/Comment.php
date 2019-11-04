@@ -3,8 +3,10 @@
 namespace app\common\model;
 
 use app\common\model\impl\ShowImpl;
+use app\common\typeCode\history\CommentLike;
 use app\common\typeCode\impl\CommentImpl;
 use think\Model;
+use think\Request;
 
 class Comment extends Model implements ShowImpl
 {
@@ -20,7 +22,7 @@ class Comment extends Model implements ShowImpl
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getList(CommentImpl $type,$start,$length,$object_id = null,$all = true)
+    public function getList(CommentImpl $type,$start,$length,$object_id = null,$login_user_id = 0,$all = true)
     {
         $tableName = $this->getTable();
 
@@ -30,18 +32,23 @@ class Comment extends Model implements ShowImpl
 
         }else{
             $handler = $this->receptionShowData();
-            $childWhere = 'and f.is_show = 1';
+            $childWhere = 'and is_show = 1';
         }
+
+        $historyType = new CommentLike();
 
         $handler = $object_id ? $handler->where(['public_id'=>$object_id]) : $handler;
 
-        $data = $handler->where(['type'=>$type->getCommentType(),'top_id'=>0])->limit($start,$length)
+        $data = $handler->alias('comment')
+            ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
+            ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
+            ->field('comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
+            ->limit($start,$length)
             ->select()->toArray();
 
         $ids = array_column($data,'id');
 
-
-        $sql = "select *
+        $sql = "select id,top_id,user_id,nickname,`comment`,like_sum,is_show,reply_nickname,reply_user_id,like_sum,create_time
                 from {$tableName}
                 where (
                    select count(*) from {$tableName} as f
@@ -58,6 +65,18 @@ class Comment extends Model implements ShowImpl
             if (!isset($data[$key]['child'])) $data[$key]['child'] = [];
         }
         return $data;
+    }
+
+    public function getReplyList(CommentImpl $type,$start,$length,$comment_id)
+    {
+        $list = $this->receptionShowData()
+            ->where(['top_id'=>$comment_id,'type'=>$type->getCommentType()])
+            ->field('id,user_id,nickname,avatar_url,comment,reply_nickname,reply_user_id,create_time')
+            ->limit($start,$length)
+            ->select();
+
+        return $list->toArray();
+
     }
 
     public function UpdateStatus($id)

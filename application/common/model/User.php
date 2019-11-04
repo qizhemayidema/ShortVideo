@@ -20,6 +20,11 @@ class User extends Model implements ShowImpl
         $this->where(['id'=>$user_id])->update(['status'=>$new_status]);
     }
 
+    public function incScore($userId,$score)
+    {
+        $this->where(['id'=>$userId])->setInc("score",$score);
+    }
+
     public function backgroundShowData(string $alias = '')
     {
         return $this;
