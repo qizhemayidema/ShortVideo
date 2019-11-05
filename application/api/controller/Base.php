@@ -26,6 +26,8 @@ class Base extends Controller
     protected function getUserInfo()
     {
         $token = \request()->param('token');
+        $token || $token = \request()->put('token');
+
         if ($token) {
             $this->userInfo = (new UserModel())->receptionShowData()->where(['token' => $token])->find();
         }

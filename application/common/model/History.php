@@ -3,6 +3,7 @@
 namespace app\common\model;
 
 use app\common\typeCode\history\VideoCollect;
+use app\common\typeCode\history\VideoLike;
 use app\common\typeCode\impl\HistoryImpl;
 use think\Model;
 
@@ -17,6 +18,16 @@ class History extends Model
                 ->join('video','history.object_id = video.id and history.user_id = '.$user_id)
                 ->where(['history.type'=>$type])
                 ->field('video.*,history.create_time collect_time')
+                ->order('history.create_time','desc')
+                ->limit($start,$length)
+                ->select()->toArray();
+        }elseif ($historyImpl instanceof VideoLike){
+            return $this->alias('history')
+                ->join('video video','history.object_id = video.id and video.user_id ='.$user_id)
+                ->join('user user','user.id = history.user_id')
+                ->where('history.type','=',$historyImpl->getType())
+                ->field('video.id video_id,user.id user_id,video.video_pic')
+                ->field('user.nickname,user.avatar_url,user.sex,history.create_time')
                 ->order('history.create_time','desc')
                 ->limit($start,$length)
                 ->select()->toArray();

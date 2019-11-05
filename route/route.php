@@ -42,6 +42,12 @@ Route::group('api',function(){
         //分享一个视频到朋友圈
         Route::post('shareFriendsRound','api/Video/shareFriendsRound')->name('ap.video.shareFriendsRound');
 
+        //评价一个视频
+        Route::post('appraise','api/Video/appraise')->name('api.video.appraise');
+
+        //观看一个视频
+        Route::post('play','api/Video/play')->name('api.video.play');
+
         //发布一个视频
         Route::post('/','api/Video/save')->name('api.video.save');
 
@@ -62,9 +68,30 @@ Route::group('api',function(){
         Route::post('pm','api/User/privateMessageSave')->name('api.user.privateMessageSave');
         //收藏列表
         Route::get('collect','api/User/collectList')->name('api.user.collectList');
+        //作品列表
+        Route::get('video','api/User/videoList')->name('api.user.videoList');
+        //获赞列表
+        Route::get('like','api/User/likeList')->name('api.user.likeList');
+        //推荐关注
+        Route::get('otherUser','api/User/otherUser')->name('api.user.otherUser');
+
+        Route::group('auth',function(){
+            //个人认证
+            Route::post('personal','api/User/authPersonal')->name('api.user.authPersonal');
+            //企业认证
+            Route::post('company','api/User/authCompany')->name('api.user.authCompany');
+        });
+        //获取用户数据
+        Route::get('/','api/User/info')->name('api.user.info');
+        //修改个人信息
+        Route::put('/','api/User/update')->name('api.user.update');
     });
     Route::group('cate',function(){
         Route::get('video','api/Category/getVideo')->name('api.category.getVideo');
+    });
+    Route::group('upload',function(){
+        Route::post('img','api/Upload/img');
+        Route::post('base64Img','api/Upload/base64Img');
     });
     Route::group('config',function(){
         Route::get('assignmentScore','api/Config/assignmentScore')->name('api.config.assignmentScore');
