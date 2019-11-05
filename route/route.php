@@ -74,6 +74,8 @@ Route::group('api',function(){
         Route::get('like','api/User/likeList')->name('api.user.likeList');
         //推荐关注
         Route::get('otherUser','api/User/otherUser')->name('api.user.otherUser');
+        //用户任务
+        Route::get('assignment','api/User/assignment')->name('api.user.assignment');
 
         Route::group('auth',function(){
             //个人认证

@@ -4,6 +4,8 @@ namespace app\api\controller;
 
 use app\common\model\UserAuth as UserAuthModel;
 use app\common\model\History as HistoryModel;
+use app\common\typeCode\history\VideoShareFriends;
+use app\common\typeCode\history\VideoShareFriendsRound;
 use think\Request;
 use think\Validate;
 use app\common\model\Both as BothModel;
@@ -15,6 +17,8 @@ use app\common\typeCode\message\PrivateMessage as PrivateMessageMessage;
 use app\common\typeCode\history\VideoCollect as VideoCollectHistory;
 use app\common\typeCode\history\FocusUser as FocusUserHistory;
 use app\common\typeCode\history\VideoLike as VideoLikeHistory;
+use app\common\typeCode\history\Video as VideoHistory;
+use app\common\model\Comment as CommentModel;
 
 class User extends Base
 {
@@ -562,6 +566,49 @@ class User extends Base
         }
 
         return json(['code'=>1,'msg'=>'success','data'=>$return]);
+    }
+
+    //用户任务
+    public function assignment(Request $request)
+    {
+        $user = $this->userInfo;
+
+        $assignment = $this->getConfig('assignment_score');
+
+        $userAuthScore = $this->getConfig('user_auth_score');
+
+        $userData = [
+            'id' => $user->id,
+            'nickname' => $user->nickname,
+            'avatar_url' => $user->avatar_url,
+            'score' => $user->score,
+            'sex' => $user->sex,
+        ];
+
+        $historyModel = new HistoryModel();
+        $shareFriendsHistory = new VideoShareFriends();
+        $shareFriendsRoundHistory = new VideoShareFriendsRound();
+        $focusUserHistory = new FocusUserHistory();
+        $videoHistory = new VideoHistory();
+        $commentModel = new CommentModel();
+
+        $today = strtotime(date('Y-m-d'));
+
+        $userResult = [
+            "first_share_friends" => $historyModel->existsHistory($shareFriendsHistory,$user->id) ? true : false,
+            "first_share_friends_round" => $historyModel->existsHistory($shareFriendsRoundHistory,$user->id) ? true : false,
+            'first_comment' => $commentModel->where(['user_id'=>$user->id])->value('id') ? true : false,
+            "first_focus" => $historyModel->existsHistory($focusUserHistory,$user->id) ? true : false,
+            "everyday_take_video" => $historyModel->where('create_time','>',$today)->where(['type'=>$videoHistory->getType()])
+                ->where(['user_id'=>$user->id])->value('id') ? true : false
+        ];
+
+        return json(['code'=>1,'msg'=>'success','data'=>[
+            'user_data' => $userData,
+            'user_auth_score' => $userAuthScore,
+            'assignment' => $assignment,
+            'user_result' => $userResult,
+        ]]);
     }
 
     //修改我的信息
