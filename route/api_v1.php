@@ -52,7 +52,7 @@ if ($version == $headerVersion){
             Route::post('appraise','Video/appraise')->name('api.video.appraise');
 
             //观看一个视频
-            Route::post('play','Video/play')->name('api.video.play');
+            Route::get('/','Video/play')->name('api.video.play');
 
             //发布一个视频
             Route::post('/','Video/save')->name('api.video.save');
@@ -107,12 +107,17 @@ if ($version == $headerVersion){
         });
         Route::group('config',function(){
             Route::get('assignmentScore','Config/assignmentScore')->name('api.config.assignmentScore');
+            Route::get('startPage','Config/startPage');
+            Route::get('article','Config/article');
+            Route::get('videoMaxSec','Config/videoMaxSec');
         });
         Route::get('search','Index/search')->name('api.index.search');
 
         Route::post('feedback','Feedback/save')->name('api.feedback.save');
 
         Route::get('version/newest','Version/getNewest');
+
+        Route::post('login','Login/login');
     });
 
 }

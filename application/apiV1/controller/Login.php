@@ -17,6 +17,7 @@ class Login extends Controller
 
         $code = $request->post('code');	//安卓端 or ios提供用户同意登入后的code
 
+        if (!$code) return json(['code'=>0,'msg'=>'登陆失败!']);
         //认证
         $url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".$appid."&secret=".$appsecret."&code=".$code ."&grant_type=authorization_code";
 
@@ -40,14 +41,14 @@ class Login extends Controller
         }
 
         $userModel = new UserModel();
-        $user = (new UserModel())->where(['openid'=>$wechat_info['openid']])->find();
-        $token = $this->makeToken($user['unionid']);
+        $user = $userModel->where(['openid'=>$wechat_info['openid']])->find();
+        $token = $this->makeToken($user['openid']);
         if (!$user){
             $user_info = [
                 "avatar_url"=>$wechat_info['headimgurl'],	//头像
                 "nickname"=>$wechat_info['nickname'],	        //昵称
                 "sex"=>$wechat_info['sex'],				            //性别
-                "openid"=>$wechat_info['openid'],		            //app唯一
+                "openid"=>$wechat_info['openid'],		                //app唯一
                 "unionid"=>$wechat_info['unionid'],		            //微信内部唯一，小程序， 公众号， web， 移动应用都是一致的
                 "province"=>$wechat_info['province'],
                 "city"=>$wechat_info['city'],
@@ -57,14 +58,12 @@ class Login extends Controller
             ];
 
             $userModel->insert($user_info);
+            $userId = $userModel->getLastInsID();
+        }else{
+            $userId = $user->id;
         }
 
-        return json(['code'=>1,'msg'=>'success','data'=>['token'=>$token]]);
-
-    }
-
-    public function getAccessToken()
-    {
+        return json(['code'=>1,'msg'=>'success','data'=>['token'=>$token,'user_id'=>$userId]]);
 
     }
 

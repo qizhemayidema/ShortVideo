@@ -11,7 +11,13 @@
 
   "take_video_auth" : "0",
 
-  "max_length_of_video_time" : 120,
+  "max_length_of_video_sec" : 120,
 
-  "start_page" : "a/b/c.jpg"
+  "start_page" : "a/b/c.jpg",
+
+  "privacy_policy" : "我是隐私协议",
+
+  "use_clause" : "我是使用条款",
+
+  "about_us" : "我是关于我们"
 }

@@ -4,6 +4,7 @@ namespace app\apiV1\controller;
 
 
 use app\common\typeCode\history\VideoAppraise;
+use think\Exception;
 use think\Request;
 use think\Validate;
 use app\common\typeCode\history\VideoLike as VideoLikeHistory;
@@ -335,14 +336,11 @@ class Video extends Base
 
         switch ($type) {
             case 1:
-                $videoLikeHistory = new VideoLikeHistory();
                 $data = $videoModel->receptionShowData('video')
                     ->alias('video')
                     ->join('user user', 'user.id = video.user_id')
-                    ->leftjoin('history history', 'history.type = ' . $videoLikeHistory->getType() . ' and history.user_id = ' . $loginUserId . ' and object_id = video.id')
-                    ->leftJoin('both both', 'both.from_user_id = ' . $loginUserId . ' and both.to_user_id = user.id')
-                    ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
-                    ->field('history.create_time is_like,both.create_time is_focus')
+                    ->field('video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
                     ->order('like_sum', 'desc')
                     ->limit($start, $length)
@@ -350,16 +348,13 @@ class Video extends Base
                 break;
             case 2:
 
-                $videoLikeHistory = new VideoLikeHistory();
                 $bothModel = new BothModel();
                 $focusUserIds = $bothModel->where(['from_user_id' => $loginUserId])->column('to_user_id');
                 $data = $videoModel->receptionShowData('video')
                     ->alias('video')
                     ->join('user user', 'user.id = video.user_id')
-                    ->leftjoin('history history', 'history.type = ' . $videoLikeHistory->getType() . ' and history.user_id = ' . $loginUserId . ' and object_id = video.id')
-                    ->leftJoin('both both', 'both.from_user_id = ' . $loginUserId . ' and both.to_user_id = user.id')
-                    ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
-                    ->field('history.create_time is_like,both.create_time is_focus')
+                    ->field('video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->whereIn('video.user_id', $focusUserIds)
                     ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
                     ->order('like_sum', 'desc')
@@ -371,7 +366,9 @@ class Video extends Base
                     ->alias('video')
                     ->where(['video.cate_id' => $cate])
                     ->join('user user', 'video.user_id = user.id')
-                    ->field('video.video_pic,video.title,video.id video_id,video.see_sum,user.nickname,user.avatar_url,user.id user_id')
+                    ->field('video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('user.avatar_url,user.nickname,user.id user_id')
+                    ->order('video.create_time','desc')
                     ->limit($start, $length)
                     ->select()->toArray();
         }
@@ -549,12 +546,46 @@ class Video extends Base
     //播放一个视频
     public function play(Request $request)
     {
-        $video_id  = $request->post('video_id');
-        if($video_id){
-            (new VideoModel())->where(['id'=>$video_id])->setInc('see_sum');
+        try{
+
+            $video_id = $request->get('video_id');
+
+            $loginUserId = $this->existsToken() ? $this->userInfo->id : 0;
+
+            if (!$video_id) throw new Exception('');
+
+            $videoModel = new VideoModel();
+            $historyModel = new HistoryModel();
+            $likeHistory = new VideoLikeHistory();
+            $collectHistory = new VideoCollectHistory();
+
+            $info = $videoModel->receptionShowData('video')
+                ->alias('video')
+                ->join('user user', 'user.id = video.user_id')
+                ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                ->field('user.avatar_url,user.nickname,user.id user_id')
+                ->where(['video.id'=>$video_id])
+                ->find()->toArray();
+
+            if (!$info) throw new Exception('');
+
+            $status = [
+                'is_focus' => $loginUserId && (new BothModel())->where(['from_user_id'=>$loginUserId,'to_user_id'=>$info['user_id']])->find() ? true : false,
+                'is_like' => $loginUserId && $historyModel->existsHistory($likeHistory,$loginUserId,$info['video_id']) ? true : false,
+                'is_collect' => $loginUserId && $historyModel->existsHistory($collectHistory,$loginUserId,$info['video_id']) ? true : false,
+            ];
+
+            $videoModel->receptionShowData()->where(['id'=>$video_id])->setInc('see_sum');
+
+            $data = [
+                'info' => $info,
+                'status' => $status,
+            ];
+            return json(['code'=>1,'msg'=>'success','data'=>$data]);
+        }catch (\Exception $e){
+            return json(['code'=>0,'msg'=>'播放出错,请稍后再试']);
         }
 
-        return json(['code'=>1,'msg'=>'success']);
     }
 
 }

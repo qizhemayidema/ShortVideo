@@ -172,7 +172,7 @@ class User extends Base
 
         if (!$validate->check($get)) return json(['code' => 0, 'msg' => $validate->getError()]);
 
-        if (isset($get['token'])) {
+        if ($this->existsToken()) {
             $loginUserId = $this->userInfo->id;
         } else {
             $loginUserId = 0;
@@ -190,10 +190,11 @@ class User extends Base
 
         $bothList = $bothModel->alias('both')
             ->join('user user', 'user.id = both.from_user_id and both.to_user_id = ' . $user->id)
-            ->leftJoin('both bothUser', 'bothUser.from_user_id =' . $loginUserId . ' and bothUser.to_user_id = both.from_user_id')
+            ->leftJoin('both bothUser', 'bothUser.from_user_id =' . $loginUserId . ' and bothUser.to_user_id = user.id')
             ->field('bothUser.create_time focus')
             ->field('user.nickname,user.avatar_url,user.id user_id,user.sex,both.create_time')
             ->limit($start, $get['length'])->select();
+
 
         return json(['code' => 1, 'msg' => 'success', 'data' => $bothList]);
     }
@@ -528,6 +529,8 @@ class User extends Base
 
             $return['is_focus'] = $bothModel->where(['from_user_id'=>$this->userInfo->id,'to_user_id'=>$return['user_id']])->find() ? true : false;
 
+        }else{
+            $return['is_focus'] = false;
         }
 
         return json(['code'=>1,'msg'=>'success','data'=>$return]);
