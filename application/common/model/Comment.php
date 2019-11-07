@@ -24,15 +24,12 @@ class Comment extends Model implements ShowImpl
      */
     public function getList(CommentImpl $type,$start,$length,$object_id = null,$login_user_id = 0,$all = true)
     {
-        $tableName = $this->getTable();
-
         if ($all){
             $handler = $this->backgroundShowData();
-            $childWhere =  '';
-
+            $childHandler = $this->backgroundShowData('comment1');
         }else{
             $handler = $this->receptionShowData();
-            $childWhere = 'and is_show = 1';
+            $childHandler = $this->receptionShowData('comment1');
         }
 
         $historyType = new CommentLike();
@@ -48,14 +45,24 @@ class Comment extends Model implements ShowImpl
 
         $ids = array_column($data,'id');
 
-        $sql = "select id,top_id,user_id,nickname,`comment`,like_sum,is_show,reply_nickname,reply_user_id,like_sum,create_time
-                from {$tableName}
-                where (
-                   select count(*) from {$tableName} as f
-                   where f.top_id = base_comment.top_id and f.create_time <= base_comment.create_time
-                ) <= 1 and top_id in(".implode(',',$ids).") {$childWhere};";
+        $child = $childHandler->alias('comment1')
+            ->leftJoin('comment comment2','comment1.top_id = comment2.top_id and comment1.id < comment2.id')
+            ->field('comment1.id,comment1.top_id,comment1.user_id,comment1.nickname,comment1.comment,comment1.like_sum,comment1.is_show,comment1.reply_nickname,comment1.reply_user_id,comment1.like_sum,comment1.create_time')
+            ->whereIn('comment1.top_id',$ids)
+            ->where('comment2.id IS NULL')
+            ->order('comment1.id','desc')
+            ->select()->toArray();
 
-        $child = $this->query($sql);
+
+//
+//        $sql = "select
+//                from {$tableName}
+//                where (
+//                   select count(*) from {$tableName} as f
+//                   where f.top_id = base_comment.top_id and f.create_time <= base_comment.create_time
+//                ) <= 1 and top_id in(".implode(',',$ids).") {$childWhere};";
+//
+//        $child = $this->query($sql);
 
         foreach ($data as $key => $value){
             foreach ($child as $key2 => $value2){

@@ -1,6 +1,7 @@
 <?php
 
-namespace app\api\controller;
+namespace app\apiV1\controller;
+
 
 use app\common\model\UserAuth as UserAuthModel;
 use app\common\model\History as HistoryModel;
@@ -26,6 +27,7 @@ class User extends Base
     //用户关注的列表
     public function focusList(Request $request)
     {
+
         $get = $request->get();
 
         $rules = [
