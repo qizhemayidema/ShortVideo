@@ -86,7 +86,10 @@ if ($version == $headerVersion){
             Route::get('otherUser','User/otherUser')->name('api.user.otherUser');
             //用户任务
             Route::get('assignment','User/assignment')->name('api.user.assignment');
-
+            //获评论列表
+            Route::get('beComment','User/beCommentList');
+            //获取消息数量
+            Route::get('msgNum','User/getMsgNum');
             Route::group('auth',function(){
                 //个人认证
                 Route::post('personal','User/authPersonal')->name('api.user.authPersonal');

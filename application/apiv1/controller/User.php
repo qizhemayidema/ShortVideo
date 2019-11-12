@@ -3,10 +3,15 @@
 namespace app\apiV1\controller;
 
 
+use app\common\model\Message;
 use app\common\model\UserAuth as UserAuthModel;
 use app\common\model\History as HistoryModel;
 use app\common\typeCode\history\VideoShareFriends;
 use app\common\typeCode\history\VideoShareFriendsRound;
+use app\common\typeCode\message\NewChat;
+use app\common\typeCode\message\NewFans;
+use app\common\typeCode\message\VideoComment;
+use app\common\typeCode\message\VideoLike;
 use think\Request;
 use think\Validate;
 use app\common\model\Both as BothModel;
@@ -14,6 +19,7 @@ use app\common\model\User as UserModel;
 use app\common\model\Message as MessageModel;
 use app\common\model\Video as VideoModel;
 use app\common\typeCode\message\NewFans as NewFansModel;
+use app\common\typeCode\message\NewChat as NewChatMessage;
 use app\common\typeCode\history\VideoCollect as VideoCollectHistory;
 use app\common\typeCode\history\FocusUser as FocusUserHistory;
 use app\common\typeCode\history\VideoLike as VideoLikeHistory;
@@ -48,6 +54,7 @@ class User extends Base
 
         if ($this->existsToken()) {
             $loginUserId = $this->userInfo->id;
+
         } else {
             $loginUserId = 0;
         }
@@ -172,6 +179,9 @@ class User extends Base
 
         if ($this->existsToken()) {
             $loginUserId = $this->userInfo->id;
+            if ($get['user_id'] == $loginUserId){   //查看自己的
+                (new Message())->seen((new NewFans()),$loginUserId);
+            }
         } else {
             $loginUserId = 0;
         }
@@ -241,6 +251,34 @@ class User extends Base
 
     }
 
+    //被评论列表
+    public function beCommentList(Request $request)
+    {
+        $user = $this->userInfo;
+        $page = $request->get('page') ?? 1;
+        $length = $request->get('length') ?? 10;
+
+        $start = $page * $length - $length;
+        $videoComment = new \app\common\typeCode\comment\Video();
+        $data = (new CommentModel())->receptionShowData('comment')->alias('comment')
+            ->join('user user','comment.user_id = user.id')
+            ->join('video video','comment.public_id = video.id and video.user_id = '.$user->id.' and comment.type = '.$videoComment->getCommentType())
+            ->where(['comment.top_id'=>0])
+            ->order('comment.id','desc')
+            ->field('user.nickname,user.id user_id,user.avatar_url,user.sex,comment.create_time comment_time,video.id video_id,video.video_pic')
+            ->limit($start,$length)
+            ->select()->toArray();
+
+
+        $messageModel = new MessageModel();
+
+        $videoComment = new VideoComment();
+
+        $messageModel->seen($videoComment,$user->id);
+
+        return json(['code'=>1,'msg'=>'success','data'=>$data]);
+    }
+
     //作品列表
     public function videoList(Request $request)
     {
@@ -295,6 +333,12 @@ class User extends Base
 
         $validate = new Validate($rules, $message);
         if (!$validate->check($get)) return json(['code' => 0, 'msg' => $validate->getError()]);
+
+        if ($this->existsToken()) {
+            if ($get['user_id'] == $this->userInfo->id){   //查看自己的
+                (new Message())->seen((new VideoLike()),$this->userInfo->id);
+            }
+        }
 
         $historyModel = new HistoryModel();
         $videoLikeHistory = new VideoLikeHistory();
@@ -494,7 +538,6 @@ class User extends Base
         return json(['code'=>1,'msg'=>'申请成功,请耐心等待']);
     }
 
-
     //获取用户信息
     public function info(Request $request)
     {
@@ -533,6 +576,7 @@ class User extends Base
 
         return json(['code'=>1,'msg'=>'success','data'=>$return]);
     }
+
 
     //用户任务
     public function assignment(Request $request)
@@ -627,7 +671,7 @@ class User extends Base
         return json(['code'=>1,'msg'=>'success']);
     }
 
-     //给某个用户发送一条私信
+    //给某个用户发送一条私信
     public function privateMessageSave(Request $request)
     {
         $post = $request->post();
@@ -664,6 +708,9 @@ class User extends Base
             //入库
             $chatModel->add($user->id, $post['user_id'], $post['message']);
 
+            //新的消息入库
+            (new Message())->send((new NewChatMessage()),$post['user_id']);
+
             $chatModel->commit();
         }catch (\Exception $e){
             $chatModel->rollback();
@@ -680,6 +727,8 @@ class User extends Base
         $length = $request->get('length') ?? 10;
         $start = $page * $length - $length;
         $user = $this->userInfo;
+
+        (new Message())->seen((new NewChat()),$user->id);
 
         $data = (new ChatGroupModel())->getList($user->id,$start,$length);
 
@@ -704,5 +753,26 @@ class User extends Base
 
         return json(['code'=>1,'msg'=>'success','data'=>array_reverse($data)]);
 
+    }
+
+    //获取用户被动消息数量
+    public function getMsgNum()
+    {
+        $user = $this->userInfo;
+
+        $messageModel = new MessageModel();
+
+        $newChat = new NewChat();
+        $newFans = new NewFans();
+        $videoComment = new VideoComment();
+        $videoLike = new VideoLike();
+
+        $data = [];
+        $data['new_chat_num'] = $messageModel->where(['type'=>$newChat->getType(),'user_id'=>$user->id,'status'=>0])->count();
+        $data['new_fans_num'] = $messageModel->where(['type'=>$newFans->getType(),'user_id'=>$user->id,'status'=>0])->count();
+        $data['video_comment_num'] = $messageModel->where(['type'=>$videoComment->getType(),'user_id'=>$user->id,'status'=>0])->count();
+        $data['video_like_num'] = $messageModel->where(['type'=>$videoLike->getType(),'user_id'=>$user->id,'status'=>0])->count();
+
+        return json(['code'=>1,'msg'=>'success','data'=>$data]);
     }
 }

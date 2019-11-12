@@ -67,7 +67,7 @@ class Comment extends Base
                 'is_show'   => 1,
             ];
 
-            //如果是不是顶级评论节点则增加顶级节点的被评论数
+            //如果不是顶级评论节点则增加顶级节点的被评论数
             if (isset($post['comment_id'])){
                 $comment = $commentModel->receptionShowData()->find($post['comment_id']);
 
@@ -76,6 +76,10 @@ class Comment extends Base
                 $insert['top_id'] = $post['comment_id'];
 
                 $comment->setInc('comment_sum');
+            }else{
+                //发送消息到本人
+                (new MessageModel())->send((new VideoCommentMessage()),$videoData['user_id']);
+
             }
 
             //如果有回复到用户,则记录,如果没有,则表明直接回复的顶级节点
@@ -93,9 +97,7 @@ class Comment extends Base
                 $historyModel->add($videoCommentHistory,$user->id,$commentModel->getLastInsID());
                 $userModel->incScore($user->id,$this->getConfig('assignment_score.first_comment'));
             }
-            //发送消息到本人
-            (new MessageModel())->send((new VideoCommentMessage()),$videoData['user_id']);
-            $commentModel->commit();
+             $commentModel->commit();
         }catch (\Exception $e){
             $commentModel->rollback();
             return json(['code'=>0,'msg'=>'系统错误,请稍后再试']);
