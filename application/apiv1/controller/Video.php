@@ -96,12 +96,10 @@ class Video extends Base
         $post = $request->post();
 
         $rules = [
-            'token' => 'require',
             'video_id' => 'require',
         ];
 
         $messages = [
-            'token.require' => 'token不合法',
             'video_id.require' => 'video_id不合法',
         ];
 
@@ -158,12 +156,10 @@ class Video extends Base
         $post = $request->post();
 
         $rules = [
-            'token' => 'require',
             'video_id' => 'require',
         ];
 
         $messages = [
-            'token.require' => 'token不合法',
             'video_id.require' => 'video_id不合法',
         ];
 
@@ -263,9 +259,7 @@ class Video extends Base
 
             return json(['code' => 0, 'msg' => '操作失败,请稍后再试']);
         }
-
         return json(['code' => 1, 'msg' => 'success']);
-
     }
 
     //视频分享到朋友圈

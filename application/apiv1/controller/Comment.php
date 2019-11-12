@@ -112,13 +112,11 @@ class Comment extends Base
         $user = $this->userInfo;
 
         $rules = [
-            'token' => 'require',
             'comment_id' => 'require',
         ];
 
         $message = [
-            'token.require' => 'token不合法',
-            'token.comment_id' => 'comment_id不合法',
+            'comment_id.require' => 'comment_id不合法',
         ];
 
         $validate = new Validate($rules,$message);

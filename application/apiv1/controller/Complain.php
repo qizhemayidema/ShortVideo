@@ -36,7 +36,6 @@ class Complain extends Base
         $user = $this->userInfo;
 
         $rules = [
-            'token'     => 'require',
             'cate_id'   => 'require',
             'content'   => 'require|max:127',
             'video_id'  => 'require',

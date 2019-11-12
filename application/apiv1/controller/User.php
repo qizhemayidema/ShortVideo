@@ -37,7 +37,7 @@ class User extends Base
         ];
 
         $message = [
-            'page.require' => 'token不合法',
+            'page.require' => 'page不合法',
             'length.require' => 'length不合法',
             'user_id.require' => 'user_id不合法'
         ];
@@ -46,7 +46,7 @@ class User extends Base
 
         if (!$validate->check($get)) return json(['code' => 0, 'msg' => $validate->getError()]);
 
-        if (isset($get['token'])) {
+        if ($this->existsToken()) {
             $loginUserId = $this->userInfo->id;
         } else {
             $loginUserId = 0;
@@ -80,12 +80,10 @@ class User extends Base
         $post = $request->post();
 
         $rules = [
-            'token' => 'require',
             'user_id' => 'require',
         ];
 
         $message = [
-            'token.require' => 'token不合法',
             'user_id.require' => 'user_id不合法',
         ];
 
@@ -163,7 +161,7 @@ class User extends Base
         ];
 
         $message = [
-            'page.require' => 'token不合法',
+            'page.require' => 'page不合法',
             'length.require' => 'length不合法',
             'user_id.require' => 'user_id不合法'
         ];
@@ -637,13 +635,11 @@ class User extends Base
         $user = $this->userInfo;
 
         $rules = [
-            'token' => 'require',
             'message' => 'require|max:127',
             'user_id' => 'require',
         ];
 
         $messages = [
-            'token.require' => 'token不合法',
             'message.require' => '信息必须填写',
             'message.max' => '信息最长不能超过127个字符',
             'user_id.require' => 'user_id不合法',

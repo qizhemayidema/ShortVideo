@@ -17,12 +17,10 @@ class Feedback extends Base
         $user = $this->userInfo;
 
         $rules = [
-            'token'   => 'require',
             'comment'   => 'require',
         ];
 
         $messages = [
-            'token.require'   => '请求错误',
             'comment.require' => '评论必须填写',
         ];
 
