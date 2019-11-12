@@ -1,0 +1,44 @@
+{include file="common/source"}
+<div class="ibox-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="m-b-md">
+                <h2>机构入驻</h2>
+            </div>
+            <dl class="dl-horizontal">
+                <dt>自我介绍</dt>
+                <dd>{$info.desc}</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <dl class="dl-horizontal">
+                <dt>名称：</dt>
+                <dd>{$info.name}</dd>
+                <dt>别名：</dt>
+                <dd>{$info.alias_name}</dd>
+                <dt>统一编码：</dt>
+                <dd>{$info.code}</dd>
+                <dt>身份证照片</dt>
+                <dd>
+                    <img src="{$info.card_pic}" width="300" alt="">
+                </dd>
+            </dl>
+        </div>
+        <div class="col-sm-7" id="cluster_info">
+            <dl class="dl-horizontal">
+                <dt>许可证编号：</dt>
+                <dd>{$info.licence_code}</dd>
+                <dt>公司位置</dt>
+                <dd>{$info.location}</dd>
+                <dt>擅长分类</dt>
+                <dd>{$info.good_at_cate}</dd>
+                <dt>学校分类</dt>
+                <dd>
+                    <img src="{$info.school_pic}" width="300" alt="">
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>

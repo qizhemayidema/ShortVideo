@@ -19,8 +19,8 @@ class Video extends Base
         $videoModel = new VideoModel();
         $video = $videoModel->backgroundShowData('video')->alias('video')
             ->join('category cate','video.cate_id = cate.id')
-            ->order('video.status','desc')
             ->order('video.id','desc')
+            ->order('video.status','desc')
             ->field('video.*,cate.name cate_name')->paginate(15);
 
         $this->assign('video',$video);

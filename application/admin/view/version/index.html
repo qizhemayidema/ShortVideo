@@ -2,15 +2,14 @@
 <div class="col-sm-12">
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <div class="input-group" style="width: 300px;">
-                <input id="search" value="{$search ?? ''}" placeholder="根据手机号或昵称搜索" type="text" class="form-control"> <span class="input-group-btn">
-                <button onclick="window.location.href = '{:url('admin/User/index')}?search='+$('#search').val()" type="button" class="btn btn-primary">搜索</button> </span>
-            </div>
             <!--<h5>-->
             <!--<button type="button" onclick="window.location.href='{:url('/admin/Goods/add')}'"-->
             <!--class="btn btn-w-m btn-primary">添加商品-->
             <!--</button>-->
             <!--</h5>-->
+            <button type="button" onclick="window.location.href='{:url('/admin/Version/add')}'"
+                    class="btn btn-w-m btn-primary">发布版本
+            </button>
         </div>
         <div class="ibox-content">
             <div class="example">
@@ -18,39 +17,23 @@
                 <table class="table table-bordered table-hover text-center">
                     <thead>
                     <tr class="text-center">
-                        <th style="text-align: center;">头像</th>
-                        <th style="text-align: center;">昵称</th>
-                        <th style="text-align: center;">状态</th>
-                        <th style="text-align: center;">创建时间</th>
+                        <th style="text-align: center;">版本号</th>
+                        <th style="text-align: center;">是否强制安装</th>
+                        <th style="text-align: center;">资源地址</th>
+                        <th style="text-align: center;">发布时间</th>
                         <th style="text-align: center;">操作</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {foreach $user as $key => $value}
+                    {foreach $list as $key => $value}
                     <tr>
-                        <td>
-                            <a target="_blank" href="{:url('index.forum.user',['id'=>$value.id])}">
-                                <img style="margin-top: 10px;" alt="image" width="38" height="38" class="img-circle" src="{$value.avatar_url}">
-                            </a>
-                        </td>
-                        <td>{$value->nickname}</td>
-                        <td>
-                            {if $value->status == 0}
-                            <a href="javascript:void(0);" onclick="checkStatus(this,0,'{$value->id}')">
-                                <p><span class="label label-info">正常</span></p>
-                            </a>
-                            {else if $value->status == 1}
-                            <a href="javascript:void(0);" onclick="checkStatus(this,1,'{$value->id}')">
-                                <p><span class="label label-danger">已冻结</span></p>
-                            </a>
-                            {/if}
-                        </td>
+                        <td>{$value.version}</td>
+                        <td>{if $value.is_compel == 0}否{else}是{/if}</td>
+                        <td><a href="{:url('admin/Version/download')}?source={$value.android_source}" >点击下载</a> </td>
                         <td>{$value->create_time|date="Y-m-d H:i:s"}</td>
                         <td>
-                            <a class="btn btn-info btn-rounded" href="javascript:info({$value.id})">查看信息</a>
-                            {if $value.auth_id}
-                            <a class="btn btn-info btn-rounded" href="{:url('admin/User_auth/info')}?id={$value.auth_id}">查看入驻信息</a>
-                            {/if}
+                            <button onclick="window.location.href='{:url('admin/Version/edit',['id'=>$value.id])}'" class="btn btn-info" type="button"><i class="fa fa-paste"></i> 编辑</button>
+                            <button onclick="removeArticle(this,'{$value.id}')" class="btn btn-danger" type="button"><i class="fa fa-remove"></i> <span class="bold">删除</span></button>
                         </td>
                     </tr>
                     {/foreach}
@@ -58,7 +41,7 @@
                 </table>
             </div>
             <div style="text-align: center;">
-                {$user->render()|raw}
+                {$list->render()|raw}
             </div>
         </div>
     </div>
@@ -90,7 +73,7 @@
     }
 
     seeAuth = function($id){
-       var index = layer.open({
+        var index = layer.open({
             type:2,
             content:"{:url('admin/User/authInfo')}?id="+$id
         })
@@ -99,11 +82,11 @@
 
     var removeArticle = function (_this, article_id) {
         $.ajax({
-            url: "{:url('admin/Forum/delete')}",
+            url: "{:url('admin/Version/delete')}",
             type: 'post',
             dataType: 'json',
             data:{
-                article_id : article_id,
+                id : article_id,
             },
             success: function (data) {
                 if (data.code == 0) {

@@ -17,52 +17,18 @@
                 <table class="table table-bordered table-hover text-center">
                     <thead>
                     <tr class="text-center">
-                        <th style="text-align: center;">举报人</th>
-                        <th style="text-align: center;">举报视频</th>
-                        <th style="text-align: center;">举报类型</th>
+                        <th style="text-align: center;">反馈人</th>
                         <th style="text-align: center;">描述</th>
-                        <th style="text-align: center;">图片</th>
-                        <th style="text-align: center;">时间</th>
-                        <th style="text-align: center;">视频状态</th>
-                        <th style="text-align: center;">操作</th>
+                        <th style="text-align: center;">创建时间</th>
                     </tr>
                     </thead>
                     <tbody>
                     {foreach $list as $key => $value}
                     <tr>
                         <td>{$value.nickname}</td>
-                        <td><a href="{:url('admin/Video/info')}?id={$value.video_id}"> {$value.video_title}</a></td>
-                        <td>{$value.cate_name}</td>
-                        <td>{$value.content}</td>
-                        <td>
-                            {foreach :explode(',',$value.files_path) as $key1 => $value1}
-                            <img src="{$value1}" class="fancybox" alt="" width="38">
-                            {/foreach}
-                        </td>
+                        <td>{$value.comment}</td>
                         <td>{$value.create_time|date="Y-m-d H:i:s"}</td>
-                        <td>
-                            {if $value.status == 0}
-                            封禁
-                            {else}
-                            正常
-                            {/if}
-                        </td>
-                        <td>
-                            <div class="btn-group">
-                                <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">审核 <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="javascript:void(0);" onclick="checkStatus(this,0,'{$value->id}')">封禁</a>
-                                    </li>
-                                    <li><a href="javascript:void(0);" onclick="checkStatus(this,1,'{$value->id}')">未审核</a>
-                                    </li>
-                                    <li><a href="javascript:void(0);" onclick="checkStatus(this,2,'{$value->id}')">审核通过</a>
-                                    </li>
-                                </ul>
-                            </div>
 
-                            <button onclick="window.location.href='{:url('admin/Video/info')}?id={$value->id}'" class="btn btn-info" type="button"> <span class="bold">详情</span></button>
-                        </td>
                     </tr>
                     {/foreach}
                     </tbody>

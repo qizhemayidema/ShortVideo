@@ -1,0 +1,174 @@
+{include file="common/source"}
+<link rel="stylesheet" href="__STATIC__/js/plugins/webuploader/webuploader.css">
+<script src="__STATIC__/js/plugins/webuploader/webuploader.js"></script>
+<div class="col-sm-12">
+    <div class="ibox-content">
+        <form action="" class="form-horizontal">
+            <input type="hidden" name="android_source" value="{$data.android_source}">
+            <input type="hidden" name="id" value="{$data.id}">
+            {:token()}
+            <input type="hidden" name="pic">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">版本号</label>
+                <div class="col-sm-8">
+                    <input name="version" required  value="{$data.version}" placeholder="例如 : 1.0.1" type="text" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">是否强制安装</label>
+                <div class="col-sm-8">
+                    <select class="form-control m-b" name="is_compel">
+                        <option value="0" {if $data.is_compel == 0} selected {/if}>否</option>
+                        <option value="1" {if $data.is_compel == 1} selected {/if}>是</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">资源文件</label>
+                <div class="col-sm-8">
+                    <!--dom结构部分-->
+                    <div id="uploader-demo">
+                        <div id="filePicker" style="margin-bottom: 10px;">选择apk</div>
+                        <!--用来存放item-->
+                        <div id="fileList" class="uploader-list">
+                            <div style="display: inline-block;margin-right: 20px;" class="upload-state-done">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">更新内容</label>
+                <div class="col-sm-8">
+                    <textarea name="update_desc" id="" style="width: 100%;" rows="5">{$data.update_desc}</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label"></label>
+                <div class="col-sm-5">
+                    <button type="button" class="btn btn-w-m btn-success" onclick="save()">修改</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+
+    var save = function () {
+        var formData = new FormData($('form')[0]);
+
+        $.ajax({
+            url: "{:url('admin/Version/update')}",
+            type: 'post',
+            dataType: 'json',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data.code == 0) {
+                    layer.msg(data.msg, {icon: 5})
+                } else {
+                    layer.msg('修改成功', {icon: 1});
+                    setTimeout(function () {
+                        window.location.href = "{:url('admin/Version/index')}";
+                    }, 600)
+                }
+            }
+        })
+    }
+
+    $(function(){
+
+        var $list = $("#fileList");
+        // 初始化Web Uploader
+        var uploader = WebUploader.create({
+
+            // 选完文件后，是否自动上传。
+            auto: true,
+
+            // swf文件路径
+            swf: "__STATIC__/js/plugins/webuploader/Uploader.swf",
+
+
+            // 文件接收服务端。
+            server: "{:url('admin/Version/upload')}",
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#filePicker',
+
+            // 只允许选择图片文件。
+            accept: {
+                title: 'Images',
+                extensions: 'apk',
+                mimeTypes: 'file/*'
+            }
+        });
+        uploader.on('fileQueued', function (file) {
+            var $li = $(
+                '<div id="' + file.id + '" style="display: inline-block;margin-right: 20px;">' +
+                '<img>' +
+                '</div>'
+                ),
+                $img = $li.find('img');
+
+
+            // $list为容器jQuery实例
+            $list.html($li);
+
+            // 创建缩略图
+            // 如果为非图片文件，可以不用调用此方法。
+            // thumbnailWidth x thumbnailHeight 为 100 x 100
+            uploader.makeThumb(file, function (error, src) {
+                if (error) {
+                    $img.replaceWith('<span>不能预览</span>');
+                    return;
+                }
+
+                $img.attr('src', src);
+            }, 100, 100);
+        });
+        uploader.on('uploadProgress', function (file, percentage) {
+            var $li = $('#' + file.id),
+                $percent = $li.find('.progress span');
+
+            // 避免重复创建
+            if (!$percent.length) {
+                $percent = $('<p class="progress"><span></span></p>')
+                    .appendTo($li)
+                    .find('span');
+            }
+
+            $percent.css('width', percentage * 100 + '%');
+        });
+
+        // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+        uploader.on('uploadSuccess', function (file, response) {
+
+            $('input[name=android_source]').val(response.msg)
+            $('#' + file.id).addClass('upload-state-done');
+        });
+
+        // 文件上传失败，显示上传出错。
+        uploader.on('uploadError', function (file) {
+            var $li = $('#' + file.id),
+                $error = $li.find('div.error');
+
+            // 避免重复创建
+            if (!$error.length) {
+                $error = $('<div class="error"></div>').appendTo($li);
+            }
+
+            $error.text('上传失败');
+        });
+
+        // 完成上传完了，成功或者失败，先删除进度条。
+        uploader.on('uploadComplete', function (file) {
+            $('#' + file.id).find('.progress').remove();
+        });
+
+
+    })
+</script>

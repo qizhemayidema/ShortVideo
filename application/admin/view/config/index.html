@@ -1,0 +1,304 @@
+{include file="common/source"}
+
+<link rel="stylesheet" href="__STATIC__/js/plugins/webuploader/webuploader.css">
+<script src="__STATIC__/js/plugins/webuploader/webuploader.js"></script>
+<script src="__STATIC__/js/plugins/summernote/summernote.min.js"></script>
+<script src="__STATIC__/js/plugins/summernote/summernote-zh-CN.js"></script>
+<link rel="stylesheet" href="__STATIC__/css/plugins/summernote/summernote.css">
+<link rel="stylesheet" href="__STATIC__/css/plugins/summernote/summernote-bs3.css">
+
+<form action="" class="form-horizontal">
+    <input type="hidden" name="start_page" value="{$config.start_page}">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="clients-list">
+                <ul class="nav nav-tabs">
+                    <span class="pull-right small text-muted"></span>
+                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="false">启动页</a>
+                    </li>
+                    <li><a data-toggle="tab" href="#tab-2" aria-expanded="true">学分设置</a>
+                    </li>
+                    <li><a data-toggle="tab" href="#tab-3" aria-expanded="true">视频相关</a>
+                    </li>
+                    <li><a data-toggle="tab" href="#tab-4" aria-expanded="true">文本相关</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane active">
+                        <div class="ibox-content">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">启动页:</label>
+                                <div class="col-sm-8">
+                                    <!--dom结构部分-->
+                                    <div id="uploader-demo">
+                                        <div id="filePicker" style="margin-bottom: 10px;">选择图片</div>
+                                        <!--用来存放item-->
+                                        <div id="fileList" class="uploader-list">
+                                            <div style="display: inline-block;margin-right: 20px;" class="upload-state-done">
+                                                <img src="{$config.start_page}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-2" class="tab-pane">
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label class="col-sm-3 control-label">入驻所需学分:</label>
+                            <div class="col-sm-8">
+                                <input name="user_auth_score" value="{$config.user_auth_score}" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label class="col-sm-3 control-label">第一次分享朋友所得:</label>
+                            <div class="col-sm-8">
+                                <input name="first_share_friends" value="{$config.assignment_score.first_share_friends}" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">第一次分享朋友圈所得:</label>
+                            <div class="col-sm-8">
+                                <input name="first_share_friends_round" value="{$config.assignment_score.first_share_friends_round}" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">第一次评论所得:</label>
+                            <div class="col-sm-8">
+                                <input name="first_comment" value="{$config.assignment_score.first_comment}" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">第一次关注所得:</label>
+                            <div class="col-sm-8">
+                                <input name="first_focus" value="{$config.assignment_score.first_focus}" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">每日第一次拍摄视频所得:</label>
+                            <div class="col-sm-8">
+                                <input name="everyday_take_video" value="{$config.assignment_score.everyday_take_video}" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-3" class="tab-pane">
+
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label class="col-sm-3 control-label">拍摄视频权限:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control m-b" name="take_video_auth" id="">
+                                    <option value="0" {if $config.take_video_auth == 0} selected {/if}>所有人</option>
+                                    <option value="1" {if $config.take_video_auth == 1} selected {/if}>教师</option>
+                                    <option value="2" {if $config.take_video_auth == 2} selected {/if}>机构</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label class="col-sm-3 control-label">视频最大时长(秒):</label>
+                            <div class="col-sm-8">
+                                <input name="max_length_of_video_sec" value="{$config.max_length_of_video_sec}" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-4" class="tab-pane">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">隐私协议</label>
+                            <div class="col-sm-8">
+                                <div class="summernote1" style="width: 700px;">
+                                    {$config.privacy_policy|raw}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用条款</label>
+                            <div class="col-sm-8">
+                                <div class="summernote2" style="width: 700px;">
+                                    {$config.use_clause|raw}
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">关于我们</label>
+                            <div class="col-sm-8">
+                                <div class="summernote3" style="width: 700px;">
+                                    {$config.about_us|raw}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 99px;">
+                        <label class="col-sm-3 control-label"></label>
+                        <div class="col-sm-5">
+                            <button type="button" class="btn btn-w-m btn-success" onclick="save()">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script>
+
+    $(document).ready(function () {
+        $('.summernote1').summernote({
+            height:"200",
+            lang: 'zh-CN'
+        });
+
+    });
+    $(document).ready(function () {
+        $('.summernote2').summernote({
+            height:"200",
+            lang: 'zh-CN'
+        });
+
+    });
+    $(document).ready(function () {
+        $('.summernote3').summernote({
+            height:"200",
+            lang: 'zh-CN'
+        });
+
+    });
+    var save = function () {
+        var formData = new FormData($('form')[0]);
+        formData.append('privacy_policy',$(".summernote1").code())
+        formData.append('use_clause',$(".summernote2").code())
+        formData.append('about_us',$(".summernote3").code())
+
+        $.ajax({
+            url: "{:url('admin/Config/save')}",
+            type: 'post',
+            dataType: 'json',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data.code == 0) {
+                    layer.msg(data.msg, {icon: 5})
+                } else {
+                    layer.msg('保存成功', {icon: 1});
+                }
+            }
+        })
+    }
+
+
+    var remove_business_parters = function(_this,val){
+        var arr = $('input[name=business_parters]').val().split(',')
+        var new_arr = [];
+        $(arr).each(function(k,v){
+            if (v != val){
+                new_arr.push(v)
+            }
+        })
+        $('input[name=business_parters]').val(new_arr.join(','))
+        $(_this).remove()
+    }
+
+    $(function () {
+
+
+        var $list = $("#fileList");
+        // 初始化Web Uploader
+        var uploader = WebUploader.create({
+
+            // 选完文件后，是否自动上传。
+            auto: true,
+
+            // swf文件路径
+            swf: "__STATIC__/js/plugins/webuploader/Uploader.swf",
+
+
+            // 文件接收服务端。
+            server: "{:url('admin/Config/UploadConfigStartPage')}",
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#filePicker',
+
+            // 只允许选择图片文件。
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            }
+        });
+        uploader.on('fileQueued', function (file) {
+            var $li = $(
+                '<div id="' + file.id + '" style="display: inline-block;margin-right: 20px;">' +
+                '<img>' +
+                '</div>'
+                ),
+                $img = $li.find('img');
+
+
+            // $list为容器jQuery实例
+            $list.html($li);
+
+            // 创建缩略图
+            // 如果为非图片文件，可以不用调用此方法。
+            // thumbnailWidth x thumbnailHeight 为 100 x 100
+            uploader.makeThumb(file, function (error, src) {
+                if (error) {
+                    $img.replaceWith('<span>不能预览</span>');
+                    return;
+                }
+
+                $img.attr('src', src);
+            }, 100, 100);
+        });
+        uploader.on('uploadProgress', function (file, percentage) {
+            var $li = $('#' + file.id),
+                $percent = $li.find('.progress span');
+
+            // 避免重复创建
+            if (!$percent.length) {
+                $percent = $('<p class="progress"><span></span></p>')
+                    .appendTo($li)
+                    .find('span');
+            }
+
+            $percent.css('width', percentage * 100 + '%');
+        });
+
+        // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+        uploader.on('uploadSuccess', function (file, response) {
+
+            $('input[name=start_page]').val(response.msg)
+            $('#' + file.id).addClass('upload-state-done');
+        });
+
+        // 文件上传失败，显示上传出错。
+        uploader.on('uploadError', function (file) {
+            var $li = $('#' + file.id),
+                $error = $li.find('div.error');
+
+            // 避免重复创建
+            if (!$error.length) {
+                $error = $('<div class="error"></div>').appendTo($li);
+            }
+
+            $error.text('上传失败');
+        });
+
+        // 完成上传完了，成功或者失败，先删除进度条。
+        uploader.on('uploadComplete', function (file) {
+            $('#' + file.id).find('.progress').remove();
+        });
+
+
+
+
+
+    })
+</script>

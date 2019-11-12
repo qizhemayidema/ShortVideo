@@ -19,12 +19,13 @@
             <div class="ibox-content profile-content">
                 <h4><strong>{$user.nickname}</strong></h4>
                 <p><i class="fa fa-map-marker"></i> {$user.country} {$user.province} {$user.city}</p>
-                <h5>
-
-                </h5>
                 <p>
                     {$user.self_desc}
                 </p>
+                <p>性别:{$user.sex == 1 ? "男" : "女"}</p>
+                <p>学分:{$user.score}</p>
+                <p>手机:{$user.phone}</p>
+                <p>微信:{$user.wechat}</p>
                 <div class="row m-t-lg">
                     <div class="col-sm-4"  style="float: left;">
                         <span class="bar">5,3,9,6,5,9,7,3,5,2</span>

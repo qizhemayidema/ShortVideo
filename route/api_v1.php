@@ -117,7 +117,10 @@ if ($version == $headerVersion){
 
         Route::get('version/newest','Version/getNewest');
 
-        Route::post('login','Login/login');
+        Route::group('login',function(){
+            Route::post('ios','Login/loginIos');
+            Route::post('','Login/login');
+        });
     });
 
 }

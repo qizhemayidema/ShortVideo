@@ -15,7 +15,7 @@ class User extends Base
 
         if ($search) $user = $user->whereLike('phone',$search)->whereOr('nickname','like','%'.$search.'%');
         $user = $user->order('id','desc')
-            ->field('id,status,create_time,nickname,avatar_url')->paginate(15,false,['query' => request()->param()]);
+            ->field('auth_id,id,status,create_time,nickname,avatar_url')->paginate(15,false,['query' => request()->param()]);
 
         $this->assign('user',$user);
         $this->assign('search',$search);
@@ -32,7 +32,7 @@ class User extends Base
 
     public function info(Request $request)
     {
-        $user = (new \app\common\model\User())->find($request->param('id'));
+        $user = (new \app\common\model\User())->find($request->param('user_id'));
 
         $this->assign('user',$user);
 
