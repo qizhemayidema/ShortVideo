@@ -40,7 +40,6 @@ class Category extends Model
         $cache->set($cacheName,$data);
 
         return $data;
-
     }
 
     public function clear(\app\common\typeCode\impl\CateImpl $obj)

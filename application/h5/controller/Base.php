@@ -1,14 +1,19 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: 刘彪
+ * Date: 2019/11/15
+ * Time: 14:17
+ */
 
-namespace app\apiv1\controller;
+namespace app\h5\controller;
 
-use think\Controller;
-use think\Request;
+
 use app\common\model\User as UserModel;
+use think\Controller;
 
 class Base extends Controller
 {
-
     const WEB_SITE_PATH = CONFIG_PATH . 'website_config.json';        //网站配置路径
 
     private $configObject = null;
@@ -27,7 +32,7 @@ class Base extends Controller
 
     protected function getUserInfo()
     {
-        $token = \think\facade\Request::header('token');
+        $token = \Request()->param('token');
 
         if ($token) {
             $this->token = $token;
@@ -40,6 +45,9 @@ class Base extends Controller
         // TODO: Implement __get() method.
         if ($name == 'userInfo') {
             if (!$this->$name) {
+                if (\Request()->isGet()){
+                    echo '请先登录账号~';
+                }
                 header('Content-type: application/json');
                 exit(json_encode(['code' => 0, 'msg' => '请先登录账号~'], 256));
 
@@ -77,5 +85,4 @@ class Base extends Controller
     {
         return  $this->token ?? false;
     }
-
 }

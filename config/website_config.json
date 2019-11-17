@@ -1,1 +1,17 @@
-{"assignment_score":{"first_share_friends":"30","first_share_friends_round":"50","first_comment":"20","first_focus":"20","everyday_take_video":"20"},"user_auth_score":"1000","take_video_auth":"0","max_length_of_video_sec":"120","start_page":"\/static\/uploads\/config\/start_page\/20191112\/d2c09bb002871d9015842c7fa467e3df.jpg","privacy_policy":"\n                                    \u6211\u662f\u9690\u79c1\u534f\u8bae                                ","use_clause":"\n                                    \u6211\u662f\u4f7f\u7528\u6761\u6b3e\n                                ","about_us":"\n                                    \u6211\u662f\u5173\u4e8e\u6211\u4eec\n                                "}
+{
+  "assignment_score": {
+    "first_share_friends": "30",
+    "first_share_friends_round": "50",
+    "first_comment": "20",
+    "first_focus": "20",
+    "everyday_take_video": "20"
+  },
+  "user_auth_score": "1000",
+  "take_video_auth": "0",
+  "max_length_of_video_sec": "120",
+  "start_page": "\/static\/uploads\/config\/start_page\/20191112\/d2c09bb002871d9015842c7fa467e3df.jpg",
+  "privacy_policy": "\n                                    \u6211\u662f\u9690\u79c1\u534f\u8bae                                ",
+  "use_clause": "\n                                    \u6211\u662f\u4f7f\u7528\u6761\u6b3e\n                                ",
+  "about_us": "\n                                    \u6211\u662f\u5173\u4e8e\u6211\u4eec\n                                ",
+  "register_policy" : ""
+}

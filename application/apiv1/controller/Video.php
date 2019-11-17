@@ -1,6 +1,6 @@
 <?php
 
-namespace app\apiV1\controller;
+namespace app\apiv1\controller;
 
 
 use app\common\typeCode\history\VideoAppraise;
@@ -362,7 +362,7 @@ class Video extends Base
                     ->join('user user', 'video.user_id = user.id')
                     ->field('video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
-                    ->order('video.create_time','desc')
+                    ->order('video.create_time', 'desc')
                     ->limit($start, $length)
                     ->select()->toArray();
         }
@@ -377,19 +377,19 @@ class Video extends Base
         $user = $this->userInfo;
 
         $rule = [
-            'video_id'  => 'require',
-            'status'    => 'require|number',
+            'video_id' => 'require',
+            'status' => 'require|number',
         ];
 
         $message = [
-            'video_id.require'  => 'video_id err',
-            'status.require'    => 'status require',
-            'status.number'     => 'status number',
+            'video_id.require' => 'video_id err',
+            'status.require' => 'status require',
+            'status.number' => 'status number',
         ];
 
-        $validate = new Validate($rule,$message);
-        if (!$validate->check($post)){
-            return json(['code'=>0,'mgs'=>$validate->getError()]);
+        $validate = new Validate($rule, $message);
+        if (!$validate->check($post)) {
+            return json(['code' => 0, 'mgs' => $validate->getError()]);
         }
         $videoModel = new VideoModel();
         $historyModel = new HistoryModel();
@@ -397,27 +397,27 @@ class Video extends Base
 
         //判断视频是否合法
         $res = $videoModel->checkShowStatus($post['video_id']);
-        if (!$res) return json(['code'=>0,'msg'=>'该视频无法评价']);
+        if (!$res) return json(['code' => 0, 'msg' => '该视频无法评价']);
 
         //判断用户是否评价过了
-        $isExists = $historyModel->existsHistory($videoAppraiseHistory,$user->id,$post['video_id']);
-        if ($isExists) return json(['code'=>0,'msg'=>'您已经评价过了,无法再次评价']);
+        $isExists = $historyModel->existsHistory($videoAppraiseHistory, $user->id, $post['video_id']);
+        if ($isExists) return json(['code' => 0, 'msg' => '您已经评价过了,无法再次评价']);
 
         $incField = $post['status'] == 1 ? 'ok_sum' : 'no_sum';
         $videoModel->startTrans();
-        try{
+        try {
             //给视频添加数据
-            $videoModel->where(['id'=>$post['video_id']])->setInc($incField);
+            $videoModel->where(['id' => $post['video_id']])->setInc($incField);
             //记录历史记录
-            $historyModel->add($videoAppraiseHistory,$user->id,$post['video_id']);
+            $historyModel->add($videoAppraiseHistory, $user->id, $post['video_id']);
 
             $videoModel->commit();
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $videoModel->rollback();
-            return json(['code'=>0,'msg'=>'操作失误,请稍后再试']);
+            return json(['code' => 0, 'msg' => '操作失误,请稍后再试']);
         }
 
-        return json(['code'=>1,'msg'=>'success']);
+        return json(['code' => 1, 'msg' => 'success']);
     }
 
     //发布一个视频
@@ -540,7 +540,7 @@ class Video extends Base
     //播放一个视频
     public function play(Request $request)
     {
-        try{
+        try {
 
             $video_id = $request->get('video_id');
 
@@ -558,28 +558,62 @@ class Video extends Base
                 ->join('user user', 'user.id = video.user_id')
                 ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                 ->field('user.avatar_url,user.nickname,user.id user_id')
-                ->where(['video.id'=>$video_id])
+                ->where(['video.id' => $video_id])
                 ->find()->toArray();
 
             if (!$info) throw new Exception('');
 
             $status = [
-                'is_focus' => $loginUserId && (new BothModel())->where(['from_user_id'=>$loginUserId,'to_user_id'=>$info['user_id']])->find() ? true : false,
-                'is_like' => $loginUserId && $historyModel->existsHistory($likeHistory,$loginUserId,$info['video_id']) ? true : false,
-                'is_collect' => $loginUserId && $historyModel->existsHistory($collectHistory,$loginUserId,$info['video_id']) ? true : false,
+                'is_focus' => $loginUserId && (new BothModel())->where(['from_user_id' => $loginUserId, 'to_user_id' => $info['user_id']])->find() ? true : false,
+                'is_like' => $loginUserId && $historyModel->existsHistory($likeHistory, $loginUserId, $info['video_id']) ? true : false,
+                'is_collect' => $loginUserId && $historyModel->existsHistory($collectHistory, $loginUserId, $info['video_id']) ? true : false,
             ];
 
-            $videoModel->receptionShowData()->where(['id'=>$video_id])->setInc('see_sum');
+            $videoModel->receptionShowData()->where(['id' => $video_id])->setInc('see_sum');
 
             $data = [
                 'info' => $info,
                 'status' => $status,
             ];
-            return json(['code'=>1,'msg'=>'success','data'=>$data]);
-        }catch (\Exception $e){
-            return json(['code'=>0,'msg'=>'播放出错,请稍后再试']);
+            return json(['code' => 1, 'msg' => 'success', 'data' => $data]);
+        } catch (\Exception $e) {
+            return json(['code' => 0, 'msg' => '播放出错,请稍后再试']);
         }
-
     }
 
+    //推荐接口
+    public function recommend(Request $request)
+    {
+        $page = $request->get('page') ?? 1;
+
+        $length = $request->get('length') ?? 10;
+
+        $loginUserId = $this->existsToken() ? $this->userInfo->id : 0;
+
+        $start = $page * $length - $length;
+
+
+        $videoModel = new VideoModel();
+        $likeHistory = new VideoLikeHistory();
+        $collectHistory = new VideoCollectHistory();
+
+        $info = $videoModel->receptionShowData('video')
+            ->alias('video')
+            ->join('user user', 'user.id = video.user_id')
+            ->leftJoin('both both', 'both.from_user_id = ' . $loginUserId . ' and both.to_user_id = video.user_id')
+            ->leftJoin('history history1', 'history1.type = ' . $likeHistory->getType() . ' and history1.user_id = ' . $loginUserId . ' and history1.object_id = video.id')
+            ->leftJoin('history history2', 'history1.type = ' . $collectHistory->getType() . ' and history1.user_id = ' . $loginUserId . ' and history1.object_id = video.id')
+            ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+            ->field('user.avatar_url,user.nickname,user.id user_id')
+            ->field('both.create_time is_focus,history1.create_time is_like,history2.create_time is_collect')
+            ->limit($start, $length)->select()->toArray();
+
+        $videoIds = array_column($info, 'video_id');
+
+        $videoModel->whereIn('id', $videoIds)->setInc('see_sum');
+
+        return json(['code' => 1, 'msg' => 'success', 'data' => $info]);
+
+
+    }
 }

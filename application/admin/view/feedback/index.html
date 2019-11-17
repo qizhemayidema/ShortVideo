@@ -19,6 +19,7 @@
                     <tr class="text-center">
                         <th style="text-align: center;">反馈人</th>
                         <th style="text-align: center;">描述</th>
+                        <th style="text-align: center;">图片</th>
                         <th style="text-align: center;">创建时间</th>
                     </tr>
                     </thead>
@@ -27,6 +28,11 @@
                     <tr>
                         <td>{$value.nickname}</td>
                         <td>{$value.comment}</td>
+                        <td>{foreach :explode(',',$value.pics) as $key1 => $value1}
+                            <img src="{$value1}" class="fancybox" alt="" width="38">
+
+                            {/foreach}
+                        </td>
                         <td>{$value.create_time|date="Y-m-d H:i:s"}</td>
 
                     </tr>
@@ -41,7 +47,13 @@
     </div>
 </div>
 <script>
-
+    $(document).ready(function(){$(".fancybox").fancybox({
+        type:'iframe',
+        openEffect:"none",
+        closeEffect:"none",
+        width:'80%',
+        height:'60%'
+    })});
     checkStatus = function(_this,status,article_id) {
         $.ajax({
             url: "{:url('admin/Video/changeStatus')}",

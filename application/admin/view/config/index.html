@@ -132,6 +132,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">注册协议</label>
+                            <div class="col-sm-8">
+                                <div class="summernote4" style="width: 700px;">
+                                    {$config.register_policy|raw}
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group" style="margin-top: 99px;">
                         <label class="col-sm-3 control-label"></label>
@@ -169,11 +178,19 @@
         });
 
     });
+    $(document).ready(function () {
+        $('.summernote4').summernote({
+            height:"200",
+            lang: 'zh-CN'
+        });
+
+    });
     var save = function () {
         var formData = new FormData($('form')[0]);
         formData.append('privacy_policy',$(".summernote1").code())
         formData.append('use_clause',$(".summernote2").code())
         formData.append('about_us',$(".summernote3").code())
+        formData.append('register_policy',$(".summernote4").code())
 
         $.ajax({
             url: "{:url('admin/Config/save')}",

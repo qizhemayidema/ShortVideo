@@ -1,6 +1,6 @@
 <?php
 
-namespace app\apiV1\controller;
+namespace app\apiv1\controller;
 
 
 use app\common\model\User as UserModel;

@@ -33,7 +33,6 @@ class History extends Model
                 ->select()->toArray();
         }else{
             return $this->where(['user_id'=>$user_id,'type'=>$type])->limit($start,$length)->select()->toArray();
-
         }
     }
     //是否存在此条记录
@@ -43,7 +42,7 @@ class History extends Model
 
         if ($object_id) $handler = $handler->where(['object_id'=>$object_id]);
 
-         return   $handler->find();
+         return  $handler->find();
     }
 
     //添加一条历史记录

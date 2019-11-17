@@ -35,6 +35,7 @@ class Config extends Base
             'privacy_policy' => $post['privacy_policy'],
             'use_clause' => $post['use_clause'],
             'about_us' => $post['about_us'],
+            'register_policy' => $post['register_policy'],
         ];
 
 

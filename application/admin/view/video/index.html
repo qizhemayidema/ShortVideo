@@ -34,15 +34,15 @@
                         <td>{$value.no_sum}</td>
                         <td class="status">
                             {if $value->status == 0}
-                            <a href="javascript:void(0);" onclick="checkStatus(this,0,'{$value->id}')">
+                            <a href="javascript:void(0);">
                                 <p><span class="label label-danger">封禁</span></p>
                             </a>
                             {elseif $value->status == 1}
-                            <a href="javascript:void(0);" onclick="checkStatus(this,1,'{$value->id}')">
+                            <a href="javascript:void(0);">
                                 <p><span class="label label-info">未审核</span></p>
                             </a>
                             {elseif $value->status == 2}
-                            <a href="javascript:void(0);" onclick="checkStatus(this,2,'{$value->id}')">
+                            <a href="javascript:void(0);" >
                                 <p><span class="label label-success">审核通过</span></p>
                             </a>
                             {/if}
@@ -106,7 +106,7 @@
 
                             </a>`
                     }
-                    $('.status').html(str)
+                    $(_this).parents('tr').find('.status').html(str)
                 }
             }
         })

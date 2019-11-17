@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>用户隐私协议</title>
+
+    <script src="__STATIC__/js/jquery.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/vue.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/IPurl.js"></script>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/css/api.css" />
+    <link rel="stylesheet" href="__STATIC__/css/weui.min.css">
+    <link rel="stylesheet" href="__STATIC__/css/class.css">
+    <style>
+        body,html{
+            background: #fff;
+        }
+        .weui-vcode-btn{
+            color: #f92d51;
+        }
+        .weui-cells_form{
+            margin-top: 0;
+        }
+        .kamiButton{
+            width: 100%;
+        }
+        .kamiButton button {
+            width: 100%;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            background-color: rgb(32, 194, 144);
+            box-shadow: 0px 2px 20px 0px rgba(196, 158, 133, 0.04);
+        }
+        #app{
+            width: 100%;
+            padding: 14px;
+        }
+        .yj{
+            width: 100%;
+            height: 156px;
+            background-color: rgba(248, 248, 248, 1);
+            border-radius: 4px 10px 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: normal;
+            font-stretch: normal;
+            line-height: 20px;
+            margin-bottom: 10px;
+            resize: none;
+            outline: none;
+        }
+        .xy_name{
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .xy_inr{
+            width: 100%;
+            padding: 15px 0;
+            box-sizing: border-box;
+        }
+        @media screen and (max-width: 768px){
+
+        }
+    </style>
+</head>
+
+<body>
+<div id="app" class="boxsiz">
+    <div class="xy_name">隐私协议</div>
+    <div class="xy_inr">
+        {$text|raw}
+    </div>
+</div>
+</body>
+<script src="__STATIC__/js/vconsole.min.js"></script>
+<script>
+    // var vConsole = new VConsole();
+</script>
+<script type="text/javascript">
+    var vm
+    // apiready = function() {
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            img_list:[],
+            btnkg:0,
+            username: '', // 用户名
+        },
+        created: function () {
+            this.btnkg=0
+        }
+    });
+    // };
+
+    function submit(){
+        //登录界面
+        //api.sendEvent广播登录成功事件
+        if(vm.btnkg==1){
+            return
+        }else{
+            vm.btnkg=1
+        }
+
+        var value1={ //you参数
+        }
+        console.log('确定')
+        $.ajax({
+            type: "GET",
+            url: IPurl,
+            data: value1,
+            success: function(res) {
+                if(typeof(res)=='string'){
+                    res=JSON.parse(res)
+                }
+
+            },
+            error: function(err) {
+                console.log('banner:'+JSON.stringify(err));
+            }
+        })
+
+
+
+    }
+</script>
+
+</html>

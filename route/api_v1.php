@@ -17,8 +17,8 @@ $version = 'V1';
 $headerVersion = strtoupper(\think\facade\Request::header('version'));
 
 if ($version == $headerVersion){
-
-    Route::group(['name'=>'api','prefix'=>'api'.$version.'/'],function(){
+Route::group(['prefix'=>'api'.$version.'/'],function(){
+    Route::group(['name'=>'api'],function(){
         Route::group('complain',function(){
             Route::group('cate',function(){
                 Route::get('video','Complain/getVideoCate')->name('api.complain.cate.video');
@@ -50,6 +50,9 @@ if ($version == $headerVersion){
 
             //评价一个视频
             Route::post('appraise','Video/appraise')->name('api.video.appraise');
+
+            //推荐列表
+            Route::get('recommend','Video/recommend');
 
             //观看一个视频
             Route::get('/','Video/play')->name('api.video.play');
@@ -90,6 +93,13 @@ if ($version == $headerVersion){
             Route::get('beComment','User/beCommentList');
             //获取消息数量
             Route::get('msgNum','User/getMsgNum');
+
+            Route::group('phone',function(){
+                //获取手机验证码
+                Route::get('code','User/getPhoneCode');
+                //绑定手机号
+                Route::post('bind','User/bindPhone');
+            });
             Route::group('auth',function(){
                 //个人认证
                 Route::post('personal','User/authPersonal')->name('api.user.authPersonal');
@@ -114,17 +124,19 @@ if ($version == $headerVersion){
             Route::get('article','Config/article');
             Route::get('videoMaxSec','Config/videoMaxSec');
         });
+        Route::group('login',function(){
+            Route::post('ios','Login/loginIos');
+            Route::post('','Login/login');
+        });
         Route::get('search','Index/search')->name('api.index.search');
 
         Route::post('feedback','Feedback/save')->name('api.feedback.save');
 
         Route::get('version/newest','Version/getNewest');
-
-        Route::group('login',function(){
-            Route::post('ios','Login/loginIos');
-            Route::post('','Login/login');
-        });
     });
+
+});
+
 
 }
 

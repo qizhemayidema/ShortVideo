@@ -1,8 +1,11 @@
 <?php
 
-namespace app\apiV1\controller;
+namespace app\apiv1\controller;
 
 
+use AlibabaCloud\Client\AlibabaCloud;
+use AlibabaCloud\Client\Exception\ClientException;
+use AlibabaCloud\Client\Exception\ServerException;
 use app\common\model\Message;
 use app\common\model\UserAuth as UserAuthModel;
 use app\common\model\History as HistoryModel;
@@ -12,6 +15,7 @@ use app\common\typeCode\message\NewChat;
 use app\common\typeCode\message\NewFans;
 use app\common\typeCode\message\VideoComment;
 use app\common\typeCode\message\VideoLike;
+use think\Cache;
 use think\Request;
 use think\Validate;
 use app\common\model\Both as BothModel;
@@ -775,4 +779,121 @@ class User extends Base
 
         return json(['code'=>1,'msg'=>'success','data'=>$data]);
     }
+
+    //获取手机验证码
+    public function getPhoneCode(Request $request)
+    {
+        $user = $this->userInfo;
+        $get = $request->get();
+
+        $rules = [
+            'phone' => 'regex:/^1[3-8]{1}[0-9]{9}$/',
+        ];
+
+        $messages = [
+            'phone.regex' => '手机号不合法',
+        ];
+
+        $validate = new Validate($rules,$messages);
+        if (!$validate->check($rules,$messages)) return json(['code'=>0,'msg'=>$validate->getError()]);
+
+        $phone = $get['phone'];
+
+        $cache = new Cache(['type'=>config('cache.type')]);
+
+        if (!$phone) return json(['code'=>0,'msg'=>'error1']);
+        if ($cache->has($phone)){
+
+            $after = $cache->get($phone)['timestamp'];
+            if (time() - $after <= 60){
+                return json(['code'=>0,'msg'=>'短信已发信,请耐心等待']);
+            }
+        }
+        $result = $this->sendPhoneMsg($phone);
+
+        if ($result['status']){
+            //记录发送时间 记录手机号
+            $cache->set($phone,$result,60);
+            return json(['code'=>1,'msg'=>'success']);
+        }else{
+            return json(['code'=>0,'msg'=>'发送失败,请联系网站管理员']);
+        }
+    }
+
+    //绑定手机号
+    public function bindPhone(Request $request)
+    {
+        $user = $this->UserInfo;
+
+        $code = $request->post('code');
+
+        $phone = $request->post('phone');
+
+        if (!$code || !$phone) return json(['code'=>0,'msg'=>'参数不正确']);
+
+        $userModel = new UserModel();
+
+        $isExists = $userModel->where(['phone'=>$phone])->find();
+
+        if ($isExists) return json(['code'=>0,'msg'=>'该手机号已绑定']);
+
+        $cache = new Cache(['type'=>config('cache.type')]);
+
+        $codes = $cache->get($phone);
+
+        if (!$codes) return json(['code'=>0,'msg'=>'验证码已过期']);
+
+        if ($codes['code'] != $code){
+            return json(['code'=>0,'msg'=>'验证码不正确']);
+        }
+
+        $userModel->where(['id'=>$user['id']])->update(['phone'=>$phone]);
+
+        $cache->set($phone,null);
+
+        return json(['code'=>1,'msg'=>'success']);
+    }
+
+    /**
+     * 发送短信
+     * @param $phone
+     * @return array
+     * @throws ClientException
+     */
+    protected function sendPhoneMsg($phone)
+    {
+        $code = mt_rand(100000,999999);
+        $access_key_id = env('SMS_ACCESS_KEY_ID');
+        $access_key_secret = env('SMS_ACCESS_KEY_SECRET');
+        $sign_name = env('SMS_SIGN_NAME');
+        $template_code = env('SMS_TEMPLATE_CODE');
+        AlibabaCloud::accessKeyClient($access_key_id, $access_key_secret)->asDefaultClient();
+
+        try {
+            $result = AlibabaCloud::rpc()
+                ->regionId('cn-beijing')
+                // ->scheme('https') // https | http
+                ->version('2017-05-25')
+                ->action('SendSms')
+                ->method('POST')
+                ->host('dysmsapi.aliyuncs.com')
+                ->options([
+                    'query' => [
+                        'PhoneNumbers'  => $phone,
+                        'SignName'  => $sign_name,
+                        'TemplateCode'  => $template_code,
+                        'TemplateParam' => json_encode(['code'=>$code]),
+                    ],
+                ])
+                ->request();
+            return ['status'=>1,'data'=>$result->toArray(),'code'=>$code,'timestamp'=>time()];
+        } catch (ClientException $e) {
+//            echo $e->getErrorMessage() . PHP_EOL;
+            return ['status'=>0,'msg'=>$e->getErrorMessage()];
+        } catch (ServerException $e) {
+            return ['status'=>0,'msg'=>$e->getErrorMessage()];
+        }
+    }
+
+
 }
