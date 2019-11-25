@@ -13,10 +13,10 @@
 
                 <table class="table table-bordered table-hover text-center">
                     <thead>
-                    <tr class="text-center">
+                    <tr class="text-center" style="width: 100px;">
                         <th style="text-align: center;">用户头像</th>
                         <th style="text-align: center;">昵称</th>
-                        <th style="text-align: center;">评论</th>
+                        <th style="text-align: center;width: 500px;">评论</th>
                         <th style="text-align: center;">回复</th>
                         <th style="text-align: center;">创建时间</th>
                         <th style="text-align: center;">是否显示</th>
@@ -25,7 +25,7 @@
                     </thead>
                     <tbody>
                     {foreach $list as $key => $value}
-                    <tr>
+                    <tr style="word-break:break-all;">
                         <td><img class="img-circle" width="38" height="38" src="{$value->avatar_url}"></td>
                         <td>{$value.nickname}</td>
                         <td>{$value->comment}</td>

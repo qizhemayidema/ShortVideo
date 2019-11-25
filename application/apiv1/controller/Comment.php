@@ -132,16 +132,26 @@ class Comment extends Base
         //检查是否点过赞了
         $history = $historyModel->existsHistory($commentLikeHistory,$user->id,$post['comment_id']);
 
-        if ($history) return json(['code'=>0,'msg'=>'您已经点过赞了,不能重复点赞哦']);
 
         $commentModel->startTrans();
         try {
 
-            //评论加赞
-            (new CommentModel())->where(['id'=>$post['comment_id']])->setInc('like_sum');
+            if ($history){
+                $data = 2;
+                //评论减赞
+                $commentModel->where(['id'=>$post['comment_id']])->setDec('like_sum');
 
-            //记录历史
-            $historyModel->add($commentLikeHistory,$user->id,$post['comment_id']);
+                //取消历史
+                $history->delete();
+            }else{
+                $data = 1;
+                //评论加赞
+                $commentModel->where(['id'=>$post['comment_id']])->setInc('like_sum');
+
+                //记录历史
+                $historyModel->add($commentLikeHistory,$user->id,$post['comment_id']);
+            }
+
 
             //不通知用户
 
@@ -151,6 +161,6 @@ class Comment extends Base
             return json(['code'=>0,'msg'=>'点赞失败']);
         }
 
-        return json(['code'=>1,'msg'=>'success']);
+        return json(['code'=>1,'msg'=>'success','data'=>$data]);
     }
 }

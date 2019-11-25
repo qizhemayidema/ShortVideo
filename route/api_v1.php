@@ -133,6 +133,8 @@ Route::group(['prefix'=>'api'.$version.'/'],function(){
         Route::post('feedback','Feedback/save')->name('api.feedback.save');
 
         Route::get('version/newest','Version/getNewest');
+
+        Route::get('sign','Sign/sign');
     });
 
 });

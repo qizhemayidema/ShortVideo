@@ -122,7 +122,7 @@ class User extends Base
             //判断是否已经关注
             if ($both = $bothModel->existsBoth($user->id, $post['user_id'])) {
                 //取消关注 2
-                $code = 2;
+                $data = 2;
                 //去掉关注状态
                 $both->delete();
 
@@ -130,7 +130,7 @@ class User extends Base
                 $userModel->where(['id' => $user->id])->setDec('focus_sum');
                 $userModel->where(['id' => $post['user_id']])->setDec('fans_sum');
             } else {
-                $code = 1;  //关注 2
+                $data = 1;  //关注 2
 
                 //关注状态增加
                 $bothModel->insert([
@@ -157,7 +157,7 @@ class User extends Base
             return json(['code' => 0, 'msg' => '操作失误,请稍后再试']);
         }
 
-        return json(['code' => $code, 'msg' => 'success']);
+        return json(['code' => 1, 'msg' => 'success','data'=>$data]);
     }
 
     //粉丝列表
@@ -363,7 +363,7 @@ class User extends Base
         $userModel = new UserModel();
 
         $count = $userModel->count();
-        if ($count < 10) {
+        if ($count <= 10) {
             $start = 1;
             $end = $count;
         } else {
@@ -665,6 +665,7 @@ class User extends Base
             'sex' => $post['sex'],
             'province' => $post['province'],
             'city' => $post['city'],
+            'wechat' => $post['wechat'],
         ];
 
         isset($post['phone']) && $post['phone'] && $update['phone'] = $post['phone'];
@@ -823,15 +824,15 @@ class User extends Base
     //绑定手机号
     public function bindPhone(Request $request)
     {
-        $user = $this->UserInfo;
+        $user = $this->userInfo;
 
         $code = $request->post('code');
 
         $phone = $request->post('phone');
 
-        if (!$code || !$phone) return json(['code'=>0,'msg'=>'参数不正确']);
-
         $userModel = new UserModel();
+
+        if (!$code || !$phone) return json(['code'=>0,'msg'=>'参数不正确']);
 
         $isExists = $userModel->where(['phone'=>$phone])->find();
 
