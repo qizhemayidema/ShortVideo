@@ -13,5 +13,8 @@ Route::group(['name'=>'h5','prefix'=>'h5/'],function(){
     Route::get('privacyPolicy','H5/privacyPolicy');
     //反馈
     Route::get('feedback','H5/feedback');
+    //关于我们
+    Route::get('aboutOur','H5/aboutOur');
+
 
 });

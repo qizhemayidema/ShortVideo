@@ -138,7 +138,9 @@
     var vm = new Vue({
         el: "#app",
         data: {
-            img_list:[],
+            img_list:[
+
+            ],
             btnkg:0,
             username: '', // 用户名
         },
@@ -198,6 +200,9 @@
                         layer.msg(res.msg)
                     } else{
                         layer.msg('反馈成功')
+                        setTimeout(function(){
+                            schClose()
+                        },700)
                     }
                     if(typeof(res)=='string'){
                         res=JSON.parse(res)

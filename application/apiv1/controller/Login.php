@@ -23,8 +23,10 @@ class Login extends Controller
         //认证
         $url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".$appid."&secret=".$appsecret."&code=".$code ."&grant_type=authorization_code";
 
+
         //调用微信api
         $rs = $this->curlData($url,[]);
+//        $this->LogTxt("\r\n=========================================".$code."\r\n".json_encode($rs,256));
         if(!$rs)return json(['code'=>0,'msg'=>'获取OPENID失败']);
 
         $rt = json_decode($rs, 256);
@@ -67,9 +69,35 @@ class Login extends Controller
             $userId = $user->id;
         }
 
-        $userInfo = $userModel->receptionShowData()->field('id,phone,wechat,nickname,avatar_url,sex,country,province,city,focus_sum,fans_sum,get_like_sum,works_sum,collect_sum,score,auth_type,token')->find($userId);
+        $user = $userModel->receptionShowData()->find($userId);
 
-        return json(['code'=>1,'msg'=>'success','data'=>$userInfo]);
+        /**
+         * ,,,,,,,,,,,,,,,score,auth_type,token
+         */
+
+        $return = [
+            'id'            => $user['id'],
+            'user_id'       => $user['id'],
+            'avatar_url'    => $user['avatar_url'],
+            'wechat'        => $user['wechat'],
+            'phone'         => $user['phone'],
+            'nickname'      => $user['nickname'],
+            'sex'           => $user['sex'],
+            'desc'          => $user['desc'],
+            'country'       => $user['country'],
+            'province'      => $user['province'],
+            'city'          => $user['city'],
+            'fans_sum'      => $user['fans_sum'],
+            'focus_sum'     => $user['focus_sum'],
+            'get_like_sum'  => $user['get_like_sum'],
+            'works_sum'     => $user['works_sum'],
+            'collect_sum'   => $user['collect_sum'],
+            'score'         => $user['score'],
+            'auth_type'     => $user['auth_type'],
+            'token'         => $user['token'],
+        ];
+
+        return json(['code'=>1,'msg'=>'success','data'=>$return]);
 
     }
 
@@ -147,6 +175,18 @@ class Login extends Controller
         $output = curl_exec($ch); //执行并获取HTML文档内容
         curl_close($ch); //释放curl句柄
         return $output;
+    }
+
+    //服务器生成日志
+    protected function LogTxt($log_txt="",$folder_file="log.txt"){
+        $folder_path =__DIR__.'/log/';
+        if (!file_exists($folder_path)) {
+            mkdir($folder_path,0777,TRUE);
+        }
+        $folder_path .= $folder_file;
+        $handle = fopen($folder_path,"a");
+        fwrite($handle,$log_txt);
+        fclose($handle);
     }
 
 }

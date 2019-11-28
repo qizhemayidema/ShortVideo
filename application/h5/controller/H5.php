@@ -366,4 +366,13 @@ class H5 extends Base
 
         return json(['code'=>1,'msg'=>'success']);
     }
+
+    public function aboutOur()
+    {
+        $text = $this->getConfig('about_us');
+
+        $this->assign('text',$text);
+
+        return $this->fetch();
+    }
 }

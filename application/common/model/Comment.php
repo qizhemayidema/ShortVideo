@@ -26,32 +26,69 @@ class Comment extends Model implements ShowImpl
     {
         if ($all){
             $handler = $this->backgroundShowData();
+            $handler2 =  $this->newInstance()->backgroundShowData();
             $childHandler = $this->backgroundShowData('comment1');
         }else{
             $handler = $this->receptionShowData();
+            $handler2 = $this->newInstance()->receptionShowData();
             $childHandler = $this->receptionShowData('comment1');
         }
 
         $historyType = new CommentLike();
 
         $handler = $object_id ? $handler->where(['public_id'=>$object_id]) : $handler;
+        $handler2 = $object_id ? $handler2->where(['public_id'=>$object_id]) : $handler2;
 
-        $data = $handler->alias('comment')
-            ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
-            ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
-            ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
-            ->limit($start,$length)
-            ->select()->toArray();
+        //根据逻辑 查出5条评论前五的
+        $topNum = 5;
 
-        $ids = array_column($data,'id');
+        if($start == 0){
 
-        $child = $childHandler->alias('comment1')
-            ->leftJoin('comment comment2','comment1.top_id = comment2.top_id and comment1.id < comment2.id')
-            ->field('comment1.id,comment1.top_id,comment1.user_id,comment1.nickname,comment1.comment,comment1.like_sum,comment1.is_show,comment1.reply_nickname,comment1.reply_user_id,comment1.like_sum,comment1.create_time')
-            ->whereIn('comment1.top_id',$ids)
-            ->where('comment2.id IS NULL')
-            ->order('comment1.id','desc')
-            ->select()->toArray();
+            $data1 = $handler->alias('comment')
+                ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
+                ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
+                ->order('comment.like_sum','desc')
+                ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
+                ->limit(0,$topNum)
+                ->select()->toArray();
+
+            $data2 = $handler2->alias('comment')
+                ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
+                ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
+                ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
+                ->limit(0,$length - $topNum)
+                ->select()->toArray();
+
+            $data = array_merge($data1,$data2);
+            $ids = array_column($data,'id');
+
+            $child = $childHandler->alias('comment1')
+                ->leftJoin('comment comment2','comment1.top_id = comment2.top_id and comment1.id < comment2.id')
+                ->field('comment1.id,comment1.top_id,comment1.user_id,comment1.nickname,comment1.comment,comment1.like_sum,comment1.is_show,comment1.reply_nickname,comment1.reply_user_id,comment1.like_sum,comment1.create_time')
+                ->whereIn('comment1.top_id',$ids)
+                ->where('comment2.id IS NULL')
+                ->order('comment1.id','desc')
+                ->select()->toArray();
+        }else{
+
+            $data = $handler->alias('comment')
+                ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
+                ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
+                ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
+                ->limit($start,$length)
+                ->select()->toArray();
+
+            $ids = array_column($data,'id');
+
+            $child = $childHandler->alias('comment1')
+                ->leftJoin('comment comment2','comment1.top_id = comment2.top_id and comment1.id < comment2.id')
+                ->field('comment1.id,comment1.top_id,comment1.user_id,comment1.nickname,comment1.comment,comment1.like_sum,comment1.is_show,comment1.reply_nickname,comment1.reply_user_id,comment1.like_sum,comment1.create_time')
+                ->whereIn('comment1.top_id',$ids)
+                ->where('comment2.id IS NULL')
+                ->order('comment1.id','desc')
+                ->select()->toArray();
+        }
+
 
 
 //

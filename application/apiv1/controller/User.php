@@ -313,7 +313,9 @@ class User extends Base
             ->field('video_pic,id,see_sum')
             ->order('create_time', 'desc')
             ->limit($start, $get['length'])->select()->toArray();
-        return json(['code' => 1, 'msg' => 'success', 'data' => $return]);
+
+        $noAuth = $videoModel->where(['user_id'=>$get['user_id'],'status'=>1])->count();
+        return json(['code' => 1, 'msg' => 'success', 'data' => $return,'no_auth_num'=>$noAuth]);
 
     }
 
@@ -555,9 +557,13 @@ class User extends Base
 
         $return = [
             'user_id'       => $user['id'],
+            'id'       => $user['id'],
             'avatar_url'    => $user['avatar_url'],
+            'wechat'        => $user['wechat'],
+            'phone'         => $user['phone'],
             'nickname'      => $user['nickname'],
             'sex'           => $user['sex'],
+            'desc'          => $user['desc'],
             'country'       => $user['country'],
             'province'      => $user['province'],
             'city'          => $user['city'],
@@ -566,8 +572,9 @@ class User extends Base
             'get_like_sum'  => $user['get_like_sum'],
             'works_sum'     => $user['works_sum'],
             'collect_sum'   => $user['collect_sum'],
+            'score'         => $user['score'],
+            'auth_type'     => $user['auth_type'],
         ];
-
         if ($this->existsToken() && isset($get['user_id'])){
 
             $bothModel = new BothModel();
@@ -640,6 +647,7 @@ class User extends Base
             'wechat'     => 'max:128',
             'province'   => 'require|max:120',
             'city'       => 'require|max:120',
+            'desc'       => 'max:200',
         ];
 
         $messages = [
@@ -651,6 +659,7 @@ class User extends Base
             'phone.regex'           => '手机号格式不合法',
             'wechat.max'            => '微信号最大长度为128',
             'province.require'      => '地址填写不完全',
+            'desc.max'              => '个人介绍最多200字',
             'city.require'      => '地址填写不完全',
         ];
 
@@ -666,6 +675,7 @@ class User extends Base
             'province' => $post['province'],
             'city' => $post['city'],
             'wechat' => $post['wechat'],
+            'desc'   => $post['desc'] ?? '',
         ];
 
         isset($post['phone']) && $post['phone'] && $update['phone'] = $post['phone'];

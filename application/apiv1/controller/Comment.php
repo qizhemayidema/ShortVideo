@@ -64,7 +64,7 @@ class Comment extends Base
                 'avatar_url'=> $user->avatar_url,
                 'comment'   => $post['content'],
                 'create_time' => time(),
-                'is_show'   => 1,
+                'is_show'   => 0,
             ];
 
             //如果不是顶级评论节点则增加顶级节点的被评论数
