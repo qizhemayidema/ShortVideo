@@ -349,7 +349,7 @@ class Video extends Base
                 $data = $videoModel->receptionShowData('video')
                     ->alias('video')
                     ->join('user user', 'user.id = video.user_id')
-                    ->field('video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
                     ->order('like_sum', 'desc')
@@ -363,7 +363,7 @@ class Video extends Base
                 $data = $videoModel->receptionShowData('video')
                     ->alias('video')
                     ->join('user user', 'user.id = video.user_id')
-                    ->field('video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->whereIn('video.user_id', $focusUserIds)
                     ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
@@ -376,7 +376,7 @@ class Video extends Base
                     ->alias('video')
                     ->where(['video.cate_id' => $cate])
                     ->join('user user', 'video.user_id = user.id')
-                    ->field('video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->order('video.create_time', 'desc')
                     ->limit($start, $length)
@@ -580,10 +580,17 @@ class Video extends Base
             if (!$info) throw new Exception('');
 
             $status = [
-                'is_focus' => $loginUserId && (new BothModel())->where(['from_user_id' => $loginUserId, 'to_user_id' => $info['user_id']])->find() ? true : false,
+//                'is_focus' => $loginUserId && (new BothModel())->where(['from_user_id' => $loginUserId, 'to_user_id' => $info['user_id']])->find() ? true : false,
                 'is_like' => $loginUserId && $historyModel->existsHistory($likeHistory, $loginUserId, $info['video_id']) ? true : false,
                 'is_collect' => $loginUserId && $historyModel->existsHistory($collectHistory, $loginUserId, $info['video_id']) ? true : false,
             ];
+
+            if ($loginUserId){
+                $both = (new BothModel())->where(['from_user_id' => $loginUserId, 'to_user_id' => $info['user_id']])->find();
+                $status['focus'] = $both ? $both['create_time'] : null;
+            }else{
+                $status['focus'] = null;
+            }
 
             $videoModel->receptionShowData()->where(['id' => $video_id])->setInc('see_sum');
 
@@ -593,7 +600,7 @@ class Video extends Base
             ];
             return json(['code' => 1, 'msg' => 'success', 'data' => $data]);
         } catch (\Exception $e) {
-            return json(['code' => 0, 'msg' => '播放出错,请稍后再试']);
+            return json(['code' => 0, 'msg' => '视频不存在']);
         }
     }
 
@@ -627,7 +634,7 @@ class Video extends Base
                     ->leftJoin('history history2', 'history2.type = ' . $collectHistory->getType() . ' and history2.user_id = ' . $loginUserId . ' and history2.object_id = video.id')
                     ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
-                    ->field('both.create_time is_focus,history1.create_time is_like,history2.create_time is_collect')
+                    ->field('both.create_time focus,history1.create_time is_like,history2.create_time is_collect')
                     ->limit($start, $length)->select()->toArray();
                 break;
             case 2:
@@ -642,7 +649,7 @@ class Video extends Base
                     ->whereIn('video.user_id',$focusUserIds)
                     ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
-                    ->field('both.create_time is_focus,history1.create_time is_like,history2.create_time is_collect')
+                    ->field('both.create_time focus,history1.create_time is_like,history2.create_time is_collect')
                     ->limit($start, $length)->select()->toArray();
                 break;
         }

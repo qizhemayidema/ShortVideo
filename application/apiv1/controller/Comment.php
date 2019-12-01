@@ -103,7 +103,10 @@ class Comment extends Base
             return json(['code'=>0,'msg'=>'系统错误,请稍后再试']);
         }
 
-        return json(['code'=>1,'msg'=>'success']);
+        $count = $commentModel->where(['type'=>(new \app\common\typeCode\comment\Video())->getCommentType(),'public_id'=>$post['video_id']])->count();
+
+
+        return json(['code'=>1,'msg'=>'success','comment_sum'=>$count]);
     }
 
     //点赞一个评论

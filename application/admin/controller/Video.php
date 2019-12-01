@@ -34,6 +34,11 @@ class Video extends Base
         $videoModel = new VideoModel();
         $info = $videoModel->backgroundShowData()->find($id);
 
+        if (!$info){
+            echo '该视频已删除';
+            die;
+        }
+
         $user = (new UserModel)->find($info->user_id);
 
         $cate = (new Category())->find($info->cate_id);

@@ -116,7 +116,10 @@ class H5 extends Base
 
         //判断用户是否已经认证过
         if ($user->auth_id != 0){
-            return '您已经认证过,无法再次认证';
+            return '<meta charset="utf-8">
+                    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+                    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+                    您已经认证过,无法再次认证';
         }
 
 

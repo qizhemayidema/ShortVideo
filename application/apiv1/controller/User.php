@@ -378,7 +378,8 @@ class User extends Base
             ->leftjoin('both both', 'both.to_user_id = user.id and both.from_user_id = ' . $user->id)
             ->whereBetween('user.id', $start . ',' . $end)
             ->where('user.id', '<>', $user->id)
-            ->field('user.id,user.nickname,user.fans_sum,user.sex,user.avatar_url,both.create_time is_focus')
+            ->where(['both.create_time'=>null])
+            ->field('user.id,user.nickname,user.fans_sum,user.sex,user.avatar_url,both.create_time focus')
             ->limit(10)
             ->select()->toArray();
 
@@ -579,10 +580,12 @@ class User extends Base
 
             $bothModel = new BothModel();
 
-            $return['is_focus'] = $bothModel->where(['from_user_id'=>$this->userInfo->id,'to_user_id'=>$return['user_id']])->find() ? true : false;
+            $focus = $bothModel->where(['from_user_id'=>$this->userInfo->id,'to_user_id'=>$return['user_id']])->find();
+
+            $return['focus'] =  $focus? $focus['create_time'] : null;
 
         }else{
-            $return['is_focus'] = false;
+            $return['focus'] = null;
         }
 
         return json(['code'=>1,'msg'=>'success','data'=>$return]);
@@ -640,7 +643,7 @@ class User extends Base
         $post = $request->put();
 
         $rules = [
-            'avatar_url' => 'require|max:128',
+            'avatar_url' => 'require|max:500',
             'sex'        => 'require|in:1,2',
             'nickname'   => 'require|max:30',
             'phone'      => 'min:11|max:11|regex:/1[3-8]{1}[0-9]{9}/',

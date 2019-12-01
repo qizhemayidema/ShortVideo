@@ -42,24 +42,27 @@ class Comment extends Model implements ShowImpl
         //根据逻辑 查出5条评论前五的
         $topNum = 5;
 
+        //热点评论
+        $hot = $handler->alias('comment')
+            ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
+            ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
+            ->order('comment.like_sum','desc')
+            ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
+            ->limit(0,$topNum)
+            ->select()->toArray();
+
+        $hotIds = array_column($hot,'id');
         if($start == 0){
 
-            $data1 = $handler->alias('comment')
+            $data = $handler2->alias('comment')
                 ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
                 ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
-                ->order('comment.like_sum','desc')
-                ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
-                ->limit(0,$topNum)
-                ->select()->toArray();
-
-            $data2 = $handler2->alias('comment')
-                ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
-                ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
+                ->whereNotIn('comment.id',$hotIds)
                 ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
                 ->limit(0,$length - $topNum)
                 ->select()->toArray();
 
-            $data = array_merge($data1,$data2);
+            $data = array_merge($hot,$data);
             $ids = array_column($data,'id');
 
             $child = $childHandler->alias('comment1')
@@ -73,6 +76,7 @@ class Comment extends Model implements ShowImpl
 
             $data = $handler->alias('comment')
                 ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
+                ->whereNotIn('comment.id',$hotIds)
                 ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
                 ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
                 ->limit($start,$length)
