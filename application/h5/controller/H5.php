@@ -126,7 +126,10 @@ class H5 extends Base
         //判断用户是否可以认证 分数
         $authScore = $this->getConfig('user_auth_score');
         if ($user->score < $authScore){
-            return '学分不够,无法认证';
+            return '<meta charset="utf-8">
+                    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+                    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+                    学分不够,无法认证';
         }
 
         $this->assign('token',$this->existsToken());

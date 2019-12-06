@@ -21,6 +21,15 @@ class Category extends Base
             $return[] = $temp;
         }
 
+        array_unshift($return,[
+            "id"=> 0,
+            "p_id" => 0,
+            "type" => 1,
+            "name" => "推荐",
+            "data_sum"=> 0,
+            "order_num"=> 0
+        ]);
+
         return json(['code'=>1,'msg'=>'success','data'=>$return]);
     }
 }

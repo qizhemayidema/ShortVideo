@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta name="format-detection" content="email=no" />
+    <meta name="format-detection" content="telephone=no">
+    <title>私信</title>
+    <link rel="stylesheet" href="__STATIC__/chat/css/weui.min.css">
+    <link rel="stylesheet" href="__STATIC__/chat/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="__STATIC__/chat/css/style.css">
+    <style>
+        .weui-media-box__thumb{
+            border-radius: 50%;
+        }
+        body,html{
+            height: 100%;
+        }
+        .weui-media-box_appmsg .weui-media-box__thumb{
+            width: 60px;
+            height: 60px;
+        }
+    </style>
+</head>
+
+<body class="bgf4">
+<div class="markBox"></div>
+<div id="app">
+    <!-- <div> -->
+    <div class="fz14 c9 tac lh40 pt20" v-show="!list.length">暂无私信<span style="display: none;">{{pageIndex}}</span></div>
+    <div v-if="list.length">
+        <div class="weui-panel__bd">
+            <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg bgf" v-for="item in list" @click="toInfo(item)">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" :src="useravt(item.peer_avatar_url)" alt="">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{item.message}}</h4>
+                    <p class="weui-media-box__desc mb10 oh1">{{item.peer_nickname}}</p>
+                    <p class="fz12 c9">{{initTime(item.create_time)}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<script src="__STATIC__/chat/js/jquery.min.js"></script>
+<script src="__STATIC__/chat/js/jquery-weui.min.js"></script>
+<script src="__STATIC__/chat/js/vue.min.js"></script>
+<script src="__STATIC__/chat/js/main.js"></script>
+<script type="text/javascript">
+    $(document.body).infinite();
+    var loading = false; //状态标记
+    $(document.body).infinite().on("infinite", function() {
+        if (loading) return;
+        loading = true;
+        // setTimeout(function() {
+        //     loading = false;
+        //     console.log('回调')
+        // }, 1500);
+        getdata();
+    });
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            list: [],
+            isloadsuccess: false,
+            pageIndex: 1,
+            noMore: false, //没有更多
+            isLoad: false // true= 在加载中
+        },
+        methods: {
+            initTime: function(time) {
+                // timearr = time.split(' ');
+                // datearr = timearr[0].split('/');
+                return getdate(time)
+            },
+            useravt: function(urls) { //用户头像
+                if (urls.indexOf('http') > -1) {
+                    return urls;
+                } else {
+                    return url + urls;
+                }
+            },
+            toInfo: function(item) {
+                window.location.href = "{:url('Chat/info')}?token=" + GetRequest().token + "&id=" + item.peer_user_id;
+            }
+        },
+        updated: function() {
+            console.log('更')
+            hideMark();
+        }
+    });
+    getdata();
+
+    function getdata() { //获取用户信息
+        if (vm.isLoad || vm.noMore) {
+            return;
+        }
+        $.showLoading();
+        var datas = {
+            "length": pagesize,
+            "page": vm.pageIndex,
+            "token": GetRequest().token
+        };
+        $.ajax({
+            url: "http://sanchihui.800123456.top/h5/chat/list",
+            type: 'get',
+            data: datas,
+            timeout: timeout,
+            success: function(ret) {
+                // var ret = JSON.parse(data);
+                $.hideLoading();
+                if (ret.code == 1) {
+                    // vm.list = ret.data;
+                    vm.list = vm.list.concat(ret.data);
+                    vm.noMore = ret.data.length < pagesize;
+                    vm.pageIndex = vm.pageIndex + 1;
+                    vm.isLoad = false;
+                } else {
+                    $.toast("获取数据失败", "cancel");
+                }
+                console.log(vm)
+            },
+            error: function(err) {
+                $.hideLoading();
+                $.alert("服务器走丢了!");
+            }
+        });
+    };
+
+    function getdate(str) {
+        var now = new Date(),
+            y = now.getFullYear(),
+            m = now.getMonth() + 1,
+            d = now.getDate();
+        return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d) + " " + now.toTimeString().substr(0, 8);
+    }
+</script>
+</body>
+
+</html>

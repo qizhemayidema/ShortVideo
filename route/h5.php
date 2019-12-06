@@ -17,4 +17,13 @@ Route::group(['name'=>'h5','prefix'=>'h5/'],function(){
     Route::get('aboutOur','H5/aboutOur');
 
 
+    Route::group('chat',function(){
+        Route::get('list','User/privateMessageList')->name('h5.user.privateMessageList');
+        Route::post('pm','User/privateMessageSave')->name('h5.user.privateMessageSave');
+        Route::get('pm','User/privateMessageInfo')->name('h5.user.privateMessageInfo');
+
+
+        Route::get('/','Chat/list');
+        Route::get('/info','Chat/info');
+    });
 });

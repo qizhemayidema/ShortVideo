@@ -15,7 +15,7 @@ class ChatGroup extends Model
             ->join('user user','user.id = group.peer_user_id')
             ->leftJoin('chat_message msg2','msg2.user_mark = msg1.user_mark and msg1.id < msg2.id')
             ->where('msg2.id IS NULL')
-            ->field('user.nickname peer_nickname,user.id peer_user_id,user.avatar_url peer_avatar_url,msg1.message message')
+            ->field('msg1.create_time,user.nickname peer_nickname,user.id peer_user_id,user.avatar_url peer_avatar_url,msg1.message message')
             ->order('msg1.create_time','desc')
             ->limit($start,$length)
             ->select()->toArray();

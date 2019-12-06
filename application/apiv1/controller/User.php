@@ -268,6 +268,7 @@ class User extends Base
             ->join('user user','comment.user_id = user.id')
             ->join('video video','comment.public_id = video.id and video.user_id = '.$user->id.' and comment.type = '.$videoComment->getCommentType())
             ->where(['comment.top_id'=>0])
+            ->where(['video.delete_time'=>0])
             ->order('comment.id','desc')
             ->field('user.nickname,user.id user_id,user.avatar_url,user.sex,comment.create_time comment_time,video.id video_id,video.video_pic')
             ->limit($start,$length)
@@ -692,7 +693,7 @@ class User extends Base
     //给某个用户发送一条私信
     public function privateMessageSave(Request $request)
     {
-        $post = $request->post();
+        $post = $request->param();
 
         $user = $this->userInfo;
 
@@ -741,8 +742,8 @@ class User extends Base
     //私信列表
     public function privateMessageList(Request $request)
     {
-        $page = $request->get('page') ?? 1;
-        $length = $request->get('length') ?? 10;
+        $page = $request->param('page') ?? 1;
+        $length = $request->param('length') ?? 10;
         $start = $page * $length - $length;
         $user = $this->userInfo;
 
@@ -759,17 +760,18 @@ class User extends Base
     {
         $user = $this->userInfo;
 
-        $userId = $request->get('user_id') ?? 0;
+        $userId = $request->param('user_id') ?? 0;
 
-        $page = $request->get('page') ?? 1;
+        $page = $request->param('page') ?? 1;
 
-        $length = $request->get('length') ?? 10;
+        $length = $request->param('length') ?? 10;
 
         $start = $page * $length - $length;
 
         $data = (new ChatMessageModel())->getList($user->id,$userId,$start,$length);
 
         return json(['code'=>1,'msg'=>'success','data'=>array_reverse($data)]);
+
 
     }
 

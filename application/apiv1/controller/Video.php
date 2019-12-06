@@ -344,44 +344,56 @@ class Video extends Base
 
         $videoModel = new VideoModel();
 
-        switch ($type) {
-            case 1:
-                $data = $videoModel->receptionShowData('video')
-                    ->alias('video')
-                    ->join('user user', 'user.id = video.user_id')
-                    ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
-                    ->field('user.avatar_url,user.nickname,user.id user_id')
-                    ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
-                    ->order('like_sum', 'desc')
-                    ->limit($start, $length)
-                    ->select()->toArray();
-                break;
-            case 2:
+        if ($cate == 0){
+            $data = $videoModel->receptionShowData('video')
+                ->alias('video')
+                ->join('user user', 'video.user_id = user.id')
+                ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                ->field('user.avatar_url,user.nickname,user.id user_id')
+                ->order('video.see_sum', 'desc')
+                ->limit($start, $length)
+                ->select()->toArray();
+        }else{
+            switch ($type) {
+                case 1:
+                    $data = $videoModel->receptionShowData('video')
+                        ->alias('video')
+                        ->join('user user', 'user.id = video.user_id')
+                        ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                        ->field('user.avatar_url,user.nickname,user.id user_id')
+                        ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
+                        ->order('like_sum', 'desc')
+                        ->limit($start, $length)
+                        ->select()->toArray();
+                    break;
+                case 2:
 
-                $bothModel = new BothModel();
-                $focusUserIds = $bothModel->where(['from_user_id' => $loginUserId])->column('to_user_id');
-                $data = $videoModel->receptionShowData('video')
-                    ->alias('video')
-                    ->join('user user', 'user.id = video.user_id')
-                    ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
-                    ->field('user.avatar_url,user.nickname,user.id user_id')
-                    ->whereIn('video.user_id', $focusUserIds)
-                    ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
-                    ->order('like_sum', 'desc')
-                    ->limit($start, $length)
-                    ->select()->toArray();
-                break;
-            case 3:
-                $data = $videoModel->receptionShowData('video')
-                    ->alias('video')
-                    ->where(['video.cate_id' => $cate])
-                    ->join('user user', 'video.user_id = user.id')
-                    ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
-                    ->field('user.avatar_url,user.nickname,user.id user_id')
-                    ->order('video.create_time', 'desc')
-                    ->limit($start, $length)
-                    ->select()->toArray();
+                    $bothModel = new BothModel();
+                    $focusUserIds = $bothModel->where(['from_user_id' => $loginUserId])->column('to_user_id');
+                    $data = $videoModel->receptionShowData('video')
+                        ->alias('video')
+                        ->join('user user', 'user.id = video.user_id')
+                        ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                        ->field('user.avatar_url,user.nickname,user.id user_id')
+                        ->whereIn('video.user_id', $focusUserIds)
+                        ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
+                        ->order('like_sum', 'desc')
+                        ->limit($start, $length)
+                        ->select()->toArray();
+                    break;
+                case 3:
+                    $data = $videoModel->receptionShowData('video')
+                        ->alias('video')
+                        ->where(['video.cate_id' => $cate])
+                        ->join('user user', 'video.user_id = user.id')
+                        ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                        ->field('user.avatar_url,user.nickname,user.id user_id')
+                        ->order('video.create_time', 'desc')
+                        ->limit($start, $length)
+                        ->select()->toArray();
+            }
         }
+
         return json(['code' => 1, 'msg' => 'success', 'data' => $data]);
     }
 
@@ -575,7 +587,7 @@ class Video extends Base
                 ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                 ->field('user.avatar_url,user.nickname,user.id user_id')
                 ->where(['video.id' => $video_id])
-                ->find()->toArray();
+                ->find();
 
             if (!$info) throw new Exception('');
 
