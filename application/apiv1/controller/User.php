@@ -6,9 +6,11 @@ namespace app\apiv1\controller;
 use AlibabaCloud\Client\AlibabaCloud;
 use AlibabaCloud\Client\Exception\ClientException;
 use AlibabaCloud\Client\Exception\ServerException;
+use app\common\model\History;
 use app\common\model\Message;
 use app\common\model\UserAuth as UserAuthModel;
 use app\common\model\History as HistoryModel;
+use app\common\typeCode\history\VideoCollect;
 use app\common\typeCode\history\VideoShareFriends;
 use app\common\typeCode\history\VideoShareFriendsRound;
 use app\common\typeCode\message\NewChat;
@@ -557,6 +559,13 @@ class User extends Base
 
         if (!$user) return json(['code'=>0,'msg'=>'err']);
 
+
+        $history = new History();
+
+        $collectTypeCode = new VideoCollect();
+
+        $collectCount = $history->getHistoryNum($collectTypeCode,$user['id']);
+
         $return = [
             'user_id'       => $user['id'],
             'id'       => $user['id'],
@@ -573,7 +582,7 @@ class User extends Base
             'focus_sum'     => $user['focus_sum'],
             'get_like_sum'  => $user['get_like_sum'],
             'works_sum'     => $user['works_sum'],
-            'collect_sum'   => $user['collect_sum'],
+            'collect_sum'   => $collectCount,
             'score'         => $user['score'],
             'auth_type'     => $user['auth_type'],
         ];

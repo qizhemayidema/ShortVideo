@@ -381,4 +381,19 @@ class H5 extends Base
 
         return $this->fetch();
     }
+
+    public function share(Request $request)
+    {
+        $id = $request->param('id');
+
+        $data = (new VideoModel())->find($id);
+
+        $author = (new \app\common\model\User())->find($data['user_id']);
+
+        $this->assign('user',$author);
+
+        $this->assign('data',$data);
+
+        return $this->fetch();
+    }
 }

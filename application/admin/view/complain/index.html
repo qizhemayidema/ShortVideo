@@ -21,7 +21,7 @@
                         <th style="text-align: center;">举报视频</th>
                         <th style="text-align: center;">举报类型</th>
                         <th style="text-align: center;">描述</th>
-                        <th style="text-align: center;">图片</th>
+                        <!--<th style="text-align: center;">图片</th>-->
                         <th style="text-align: center;">时间</th>
                         <th style="text-align: center;">视频状态</th>
                         <th style="text-align: center;">操作</th>
@@ -34,11 +34,11 @@
                         <td><a href="{:url('admin/Video/info')}?id={$value.video_id}"> {$value.video_title}</a></td>
                         <td>{$value.cate_name}</td>
                         <td>{$value.content}</td>
-                        <td>
-                            {foreach :explode(',',$value.files_path) as $key1 => $value1}
-                            <img src="{$value1}" class="fancybox" alt="" width="38">
-                            {/foreach}
-                        </td>
+                        <!--<td>-->
+                            <!--{foreach :explode(',',$value.files_path) as $key1 => $value1}-->
+                            <!--<img src="{$value1}" class="fancybox" alt="" width="38">-->
+                            <!--{/foreach}-->
+                        <!--</td>-->
                         <td>{$value.create_time|date="Y-m-d H:i:s"}</td>
                         <td>
                             {if $value.status == 0}

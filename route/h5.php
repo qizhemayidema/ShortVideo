@@ -15,6 +15,8 @@ Route::group(['name'=>'h5','prefix'=>'h5/'],function(){
     Route::get('feedback','H5/feedback');
     //关于我们
     Route::get('aboutOur','H5/aboutOur');
+    //分享
+    Route::get('share','H5/share');
 
 
     Route::group('chat',function(){

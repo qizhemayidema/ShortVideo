@@ -17,6 +17,7 @@ class History extends Model
             return $this->alias('history')
                 ->join('video','history.object_id = video.id and history.user_id = '.$user_id)
                 ->where(['history.type'=>$type])
+                ->where(['video.delete_time'=>0])
                 ->field('video.*,history.create_time collect_time')
                 ->order('history.create_time','desc')
                 ->limit($start,$length)
@@ -26,6 +27,7 @@ class History extends Model
                 ->join('video video','history.object_id = video.id and video.user_id ='.$user_id)
                 ->join('user user','user.id = history.user_id')
                 ->where('history.type','=',$historyImpl->getType())
+                ->where(['video.delete_time'=>0])
                 ->field('video.id video_id,user.id user_id,video.video_pic')
                 ->field('user.nickname,user.avatar_url,user.sex,history.create_time')
                 ->order('history.create_time','desc')
@@ -34,6 +36,33 @@ class History extends Model
         }else{
             return $this->where(['user_id'=>$user_id,'type'=>$type])->limit($start,$length)->select()->toArray();
         }
+    }
+
+    public function getHistoryNum(HistoryImpl $historyImpl,$user_id)
+    {
+        $type = $historyImpl->getType();
+        if ($historyImpl instanceof VideoCollect){
+            return $this->alias('history')
+                ->join('video','history.object_id = video.id and history.user_id = '.$user_id)
+                ->where(['history.type'=>$type])
+                ->where(['video.delete_time'=>0])
+//                ->field('video.*,history.create_time collect_time')
+                ->order('history.create_time','desc')
+                ->count();
+        }elseif ($historyImpl instanceof VideoLike){
+            return $this->alias('history')
+                ->join('video video','history.object_id = video.id and video.user_id ='.$user_id)
+                ->join('user user','user.id = history.user_id')
+                ->where('history.type','=',$historyImpl->getType())
+                ->where(['video.delete_time'=>0])
+//                ->field('video.id video_id,user.id user_id,video.video_pic')
+//                ->field('user.nickname,user.avatar_url,user.sex,history.create_time')
+                ->order('history.create_time','desc')
+                ->count();
+        }else{
+            return $this->where(['user_id'=>$user_id,'type'=>$type])->count();
+        }
+
     }
     //是否存在此条记录
     public function existsHistory(HistoryImpl $historyImpl,$user_id,$object_id = 0)

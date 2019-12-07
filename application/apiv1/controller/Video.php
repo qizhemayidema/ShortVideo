@@ -644,7 +644,7 @@ class Video extends Base
                     ->leftJoin('both both', 'both.from_user_id = ' . $loginUserId . ' and both.to_user_id = video.user_id')
                     ->leftJoin('history history1', 'history1.type = ' . $likeHistory->getType() . ' and history1.user_id = ' . $loginUserId . ' and history1.object_id = video.id')
                     ->leftJoin('history history2', 'history2.type = ' . $collectHistory->getType() . ' and history2.user_id = ' . $loginUserId . ' and history2.object_id = video.id')
-                    ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('video.see_sum,video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->field('both.create_time focus,history1.create_time is_like,history2.create_time is_collect')
                     ->limit($start, $length)->select()->toArray();
@@ -659,7 +659,7 @@ class Video extends Base
                     ->leftJoin('history history1', 'history1.type = ' . $likeHistory->getType() . ' and history1.user_id = ' . $loginUserId . ' and history1.object_id = video.id')
                     ->leftJoin('history history2', 'history2.type = ' . $collectHistory->getType() . ' and history2.user_id = ' . $loginUserId . ' and history2.object_id = video.id')
                     ->whereIn('video.user_id',$focusUserIds)
-                    ->field('video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
+                    ->field('video.see_sum,video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->field('both.create_time focus,history1.create_time is_like,history2.create_time is_collect')
                     ->limit($start, $length)->select()->toArray();

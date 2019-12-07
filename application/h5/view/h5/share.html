@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta name="format-detection" content="email=no" />
+    <meta name="format-detection" content="telephone=no">
+    <title>分享</title>
+    <link rel="stylesheet" href="__STATIC__/chat/css/weui.min.css">
+    <link rel="stylesheet" href="__STATIC__/chat/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="__STATIC__/chat/css/style.css">
+    <style>
+        html,body{
+            height: 100%
+        }
+    </style>
+</head>
+
+<body class="bgf4">
+    <!-- <div class="markBox"></div> -->
+    <div id="app">
+        <div v-show="!isPlay" class="video_cover" style="background-image: url(http://sanchihui.800123456.top/static/uploads/1.jpg);">
+            <div class="play" onclick="play();">
+                <img src="__STATIC__/images/play.png" alt="">
+            </div>
+        </div>
+        <div class="video_box1">
+            <video src="{$data.source_url}"></video>
+        </div>
+        <div class="user_box">
+            <h3 class="fz14 cf  p10">{$data.title}</h3>
+            <div class="flex itc u_avt_box">
+                <div class="user_avt mr10">
+                    <img src="{$user.avatar_url}" alt="">
+                </div>
+                <div class="fz14 cf ">{$user.nickname}</div>
+            </div>
+        </div>
+    </div>
+    <script src="__STATIC__/chat/js/jquery.min.js"></script>
+    <script src="__STATIC__/chat/js/flexible.js"></script>
+    <script src="__STATIC__/chat/js/chat.js" type="text/javascript" charset="utf-8"></script>
+    <script src="__STATIC__/chat/js/jquery-weui.min.js"></script>
+    <script src="__STATIC__/chat/js/vue.min.js"></script>
+    <script src="__STATIC__/chat/js/main.js"></script>
+    <!-- <script src="__STATIC__/chat/js/vconsole.min.js"></script> -->
+    <script type="text/javascript">
+    function play() {
+        $("video")[0].play();
+        vm.isPlay = true;
+    }
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            list: [],
+            isPlay: false,
+            isloadsuccess: false,
+            pageIndex: 1,
+            noMore: false, //没有更多
+            isLoad: false // true= 在加载中
+        },
+        methods: {
+            initTime: function(time) {
+                // timearr = time.split(' ');
+                // datearr = timearr[0].split('/');
+                return getdate(time)
+            },
+            useravt: function(urls) { //用户头像
+                if (urls.indexOf('http') > -1) {
+                    return urls;
+                } else {
+                    return url + urls;
+                }
+            }
+        },
+        updated: function() {
+            console.log('更')
+            hideMark();
+        }
+    });
+    // getdata();
+
+    function getdata() { //获取用户信息
+        if (vm.isLoad || vm.noMore) {
+            return;
+        }
+        $.showLoading();
+        var datas = {
+            "length": pagesize,
+            "page": vm.pageIndex,
+            "token": GetRequest().token
+        };
+        $.ajax({
+            url: "http://sanchihui.800123456.top/h5/chat/list",
+            type: 'get',
+            data: datas,
+            timeout: timeout,
+            success: function(ret) {
+                // var ret = JSON.parse(data);
+                $.hideLoading();
+                if (ret.code == 1) {
+                    // vm.list = ret.data;
+                    vm.list = vm.list.concat(ret.data);
+                    vm.noMore = ret.data.length < pagesize;
+                    vm.pageIndex = vm.pageIndex + 1;
+                    vm.isLoad = false;
+                } else {
+                    $.toast("获取数据失败", "cancel");
+                }
+                console.log(vm)
+            },
+            error: function(err) {
+                $.hideLoading();
+                $.alert("服务器走丢了!");
+            }
+        });
+    };
+
+    function getdate(str) {
+        var now = new Date(),
+            y = now.getFullYear(),
+            m = now.getMonth() + 1,
+            d = now.getDate();
+        return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d) + " " + now.toTimeString().substr(0, 8);
+    }
+    </script>
+</body>
+
+</html>
