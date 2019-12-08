@@ -137,7 +137,7 @@
         <label class="xzsf" for="sf1"><input id="sf1" name="sf" type="radio" v-model="sf_type" value="1">老师</label>
         <label class="xzsf" for="sf2"><input id="sf2" name="sf" type="radio" v-model="sf_type" value="2"> 教育机构</label>
     </div>
-    <div  v-show="sf_type==1" class="w100">
+    <div  v-if="sf_type==1" class="w100">
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="姓名">
             <input class="li_inr flex1 boxsiz" type="text" v-model="sf1.name" placeholder="请输入">
@@ -176,7 +176,7 @@
             </div>
         </div>
     </div>
-    <div  v-show="sf_type==2" class="w100">
+    <div  v-if="sf_type==2" class="w100">
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="机构名称">
             <input class="li_inr flex1 boxsiz" type="text" v-model="sf2.jgname" placeholder="请输入">
@@ -279,7 +279,14 @@
                 xximg:'',       //学校照片
                 location:'',
             },
-            columns: ['英语', '语文', '数学', '物理','化学','地理','历史','政治'],
+            columns: [
+                {foreach $list as $k => $v}
+                    '{$v.name}'
+    {if $k - 1 != count($list)}
+    ,
+    {/if}
+                {/foreach}
+            ],
 
             btnkg:0,
 
@@ -287,7 +294,7 @@
             fenlei:[],
             showPicker: false,
 
-            value:'英语',
+            value:'{if isset($list[0]['name'])}{$list[0]['name']}{/if}',
         },
         methods:{
             onConfirm(value) {

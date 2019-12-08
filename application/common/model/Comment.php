@@ -74,12 +74,13 @@ class Comment extends Model implements ShowImpl
                 ->select()->toArray();
         }else{
 
-            $data = $handler->alias('comment')
+            $data = $handler2->alias('comment')
                 ->leftJoin('history','history.user_id = '.$login_user_id.' and history.object_id = comment.id and history.type = '.$historyType->getType())
                 ->whereNotIn('comment.id',$hotIds)
                 ->where(['comment.type'=>$type->getCommentType(),'comment.top_id'=>0])
                 ->field('comment.create_time,comment.avatar_url,comment.id,comment.user_id,comment.nickname,comment.comment,comment.like_sum,comment.is_show,comment.comment_sum,history.create_time is_like')
                 ->limit($start,$length)
+//                ->buildSql(true);
                 ->select()->toArray();
 
             $ids = array_column($data,'id');

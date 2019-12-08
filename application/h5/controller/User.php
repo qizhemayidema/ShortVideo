@@ -96,9 +96,18 @@ class User extends Base
 
         $start = $page * $length - $length;
 
+        $otherUser = (new UserModel())->find($userId);
+
+
         $data = (new ChatMessageModel())->getList($user->id,$userId,$start,$length);
 
-        return json(['code'=>1,'msg'=>'success','data'=>array_reverse($data),'user'=>['avatar_url'=>$user['avatar_url']]]);
+        return json([
+            'code'=>1,
+            'msg'=>'success',
+            'data'=>array_reverse($data),
+            'user'=>['avatar_url'=>$user['avatar_url']],
+            'other_user' => ['nickname'=>$otherUser['nickname']]
+        ]);
 
 
     }

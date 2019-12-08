@@ -1,15 +1,17 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta name="format-detection" content="email=no" />
+    <meta name="format-detection" content="telephone=no">
     <title>聊天界面</title>
     <link rel="stylesheet" href="__STATIC__/chat/css/weui.min.css">
     <link rel="stylesheet" href="__STATIC__/chat/css/jquery-weui.min.css">
-    <link rel="stylesheet" href="__STATIC__/chat/css/style.css">
+    
     <link rel="stylesheet" href="__STATIC__/chat/css/chat.css">
+    <link rel="stylesheet" href="__STATIC__/chat/css/style.css">
     <!-- // <script src="js/jquery.min.js"></script> -->
     <style>
         .msg img{
@@ -43,6 +45,10 @@
         .reply .msg>p {
             top: .4rem;
         }
+        #footer{
+            background: #f1f2f4;
+        }
+.msg img{border-radius: 50%;}
     </style>
 </head>
 
@@ -54,7 +60,7 @@
         <div><span style="display: none;">{{pageIndex}}</span></div>
         <!-- 循环开始 -->
         <div v-for="item in list" class="boxH mb10">
-            <div class="reply" v-if="id != item.user_id">
+            <div class="reply" v-if="id == item.user_id">
                 <div class="time lh40">{{initTime(item.create_time)}}</div>
                 <div class="msg clear">
                     <img :src="useravt(item.user_avatar_url)" alt="" />
@@ -89,6 +95,7 @@
 <script src="__STATIC__/chat/js/jquery-weui.min.js"></script>
 <script src="__STATIC__/chat/js/vue.min.js"></script>
 <script src="__STATIC__/chat/js/main.js"></script>
+<!--<script src="__STATIC__/chat/js/vconsole.min.js"></script>-->
 <script>
     $(window).scroll(function(event) {
         var scrollT = $(this).scrollTop();
@@ -113,7 +120,7 @@
     function sendStrFn(sendStr) { //发送信息
         var datas = {
             "message": sendStr,
-            "user_id": GetRequest().id,
+            "user_id": GetRequest().user_id,
             "token": GetRequest().token
         };
         $.ajax({
@@ -134,7 +141,7 @@
                     vm.list.push(_obj);
                     scrollBottom();
                 } else {
-                    $.toast("发送失败", "cancel");
+                    $.toast(ret.msg, "cancel");
                 }
             },
             error: function(err) {
@@ -179,10 +186,10 @@
             hideMark();
         }
     });
-
+    vm.id = GetRequest().user_id;
     getdata();
 
-    vm.id = GetRequest().id;
+    
 
     function getdata(op) { //获取历史信息
         if (vm.isLoad || vm.noMore) {
@@ -193,7 +200,7 @@
             "length": pagesize,
             "page": vm.pageIndex,
             "token": GetRequest().token,
-            "user_id": GetRequest().id
+            "user_id": GetRequest().user_id
         };
         $.ajax({
             url: "http://sanchihui.800123456.top/h5/chat/pm",
@@ -202,6 +209,7 @@
             timeout: timeout,
             success: function(ret) {
                 // var ret = JSON.parse(data);
+                console.log(ret)
                 $.hideLoading();
                 if (ret.code == 1) {
                     if (op == 'more') {

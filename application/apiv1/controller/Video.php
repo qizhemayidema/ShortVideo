@@ -350,6 +350,7 @@ class Video extends Base
                 ->join('user user', 'video.user_id = user.id')
                 ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                 ->field('user.avatar_url,user.nickname,user.id user_id')
+                ->where('video.like_sum','>',20)
                 ->order('video.see_sum', 'desc')
                 ->limit($start, $length)
                 ->select()->toArray();

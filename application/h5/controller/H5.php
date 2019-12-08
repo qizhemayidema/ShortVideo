@@ -4,7 +4,9 @@ namespace app\h5\controller;
 
 use app\apiv1\controller\Feedback;
 use app\common\lib\Upload;
+use app\common\model\Category;
 use app\common\model\UserAuth;
+use app\common\typeCode\cate\Video;
 use think\Controller;
 use think\Request;
 use think\Validate;
@@ -132,6 +134,9 @@ class H5 extends Base
                     学分不够,无法认证';
         }
 
+        $list = (new Category())->getList((new Video()));
+
+        $this->assign('list',$list);
         $this->assign('token',$this->existsToken());
 
         return $this->fetch();
