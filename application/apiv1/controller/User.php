@@ -879,6 +879,29 @@ class User extends Base
         return json(['code'=>1,'msg'=>'success']);
     }
 
+    public function checkMakeVideoAuth()
+    {
+        $user = $this->userInfo;
+
+        //判断用户是否能够发布
+        $authType = $this->getConfig('take_video_auth');
+
+
+
+        if ($authType != 0 && $user->authType != $authType) {
+            $name = '';
+            if ($authType == 1){
+                $name = '教师';
+            }elseif ($authType == 2){
+                $name = '机构';
+            }
+            return json(['code' => 0, 'msg' => '仅限'.$name.'发布视频']);
+        }
+
+        return json(['code'=>1,'msg'=>'success']);
+
+    }
+
     /**
      * 发送短信
      * @param $phone
@@ -919,6 +942,4 @@ class User extends Base
             return ['status'=>0,'msg'=>$e->getErrorMessage()];
         }
     }
-
-
 }

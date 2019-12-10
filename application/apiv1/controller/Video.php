@@ -457,7 +457,7 @@ class Video extends Base
         //判断用户是否能够发布
         $authType = $this->getConfig('take_video_auth');
 
-        if ($authType != 0 && $user->auth_id != $authType) {
+        if ($authType != 0 && $user->authType != $authType) {
             return json(['code' => 0, 'msg' => '您无权发布视频']);
         }
 

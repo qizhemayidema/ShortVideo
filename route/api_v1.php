@@ -105,6 +105,8 @@ Route::group(['prefix'=>'api'.$version.'/'],function(){
                 Route::post('personal','User/authPersonal')->name('api.user.authPersonal');
                 //企业认证
                 Route::post('company','User/authCompany')->name('api.user.authCompany');
+                //该用户是否拥有权限
+                Route::post('/','User/checkMakeVideoAuth');
             });
             //获取用户数据
             Route::get('/','User/info')->name('api.user.info');
