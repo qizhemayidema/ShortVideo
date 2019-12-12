@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+﻿<!DOCTYPE HTML>
 <html>
 
 <head>
@@ -19,6 +19,7 @@
     <link rel="stylesheet" type="text/css" href="__STATIC__/css/class.css"/>
     <link rel="stylesheet" type="text/css" href="__STATIC__/css/vantIndex.css"/>
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_1218663_avyf5h8t28e.css">
+    <!-- <script src="__STATIC__/chat/js/vconsole.min.js"></script> -->
     <style>
         body,html{
             background: #f8f8f8;
@@ -48,7 +49,7 @@
         }
         .fb_li{
             width: 100%;
-            min-height: 46px;
+            min-height: 40px;
             padding: 0 14px;
             -ms-align-items: center;
             align-items: center;
@@ -56,15 +57,15 @@
             border-bottom: 1px solid #eee;
         }
         .li_tit{
-            height: 46px;
+            height: 40px;
             font-size: 14px;
             color: #3b3b3b;
             line-height: 16px;
             min-width: 0;
-            width: 100px;
+            width: 80px;
         }
         .li_inr{
-            height: 46px;
+            height: 40px;
             /* padding: 0 14px; */
             font-size: 14px;
             color: #3b3b3b;
@@ -137,18 +138,18 @@
         <label class="xzsf" for="sf1"><input id="sf1" name="sf" type="radio" v-model="sf_type" value="1">老师</label>
         <label class="xzsf" for="sf2"><input id="sf2" name="sf" type="radio" v-model="sf_type" value="2"> 教育机构</label>
     </div>
-    <div  v-if="sf_type==1" class="w100">
+    <div  v-show="sf_type==1" class="w100">
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="姓名">
             <input class="li_inr flex1 boxsiz" type="text" v-model="sf1.name" placeholder="请输入">
         </div>
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="身份证号">
-            <input class="li_inr flex1 boxsiz" type="text" v-model="sf1.sfz" placeholder="请输入">
+            <input class="li_inr flex1 boxsiz" onKeyUp="value=value.replace(/[\W]/g,'')" type="text" v-model="sf1.sfz" placeholder="请输入">
         </div>
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="教师证号">
-            <input class="li_inr flex1 boxsiz" type="text" v-model="sf1.jsz" placeholder="请输入">
+            <input class="li_inr flex1 boxsiz" type="text" onKeyUp="value=value.replace(/[\W]/g,'')" v-model="sf1.jsz" placeholder="请输入">
         </div>
         <div class="disflex boxsiz fb_li ju_b bt1" @click="showPicker = true">
             <input class="li_tit" style="width: 4em;" value="擅长分类"  readonly>
@@ -176,7 +177,7 @@
             </div>
         </div>
     </div>
-    <div  v-if="sf_type==2" class="w100">
+    <div  v-show="sf_type==2" class="w100">
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="机构名称">
             <input class="li_inr flex1 boxsiz" type="text" v-model="sf2.jgname" placeholder="请输入">
@@ -187,11 +188,11 @@
         </div>
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="统一编码">
-            <input class="li_inr flex1 boxsiz" type="text" v-model="sf2.tybm" placeholder="请输入">
+            <input class="li_inr flex1 boxsiz" onKeyUp="value=value.replace(/[\W]/g,'')" type="text" v-model="sf2.tybm" placeholder="请输入">
         </div>
         <div class="disflex boxsiz fb_li">
             <input class="li_tit" type="text" readonly value="办学许可证">
-            <input class="li_inr flex1 boxsiz" type="text" v-model="sf2.bxykz" placeholder="请输入">
+            <input class="li_inr flex1 boxsiz" onKeyUp="value=value.replace(/[\W]/g,'')" type="text" v-model="sf2.bxykz" placeholder="请输入">
         </div>
 
         <div class="disflex boxsiz fb_li">
@@ -281,17 +282,17 @@
             },
             columns: [
                 {foreach $list as $k => $v}
-                    '{$v.name}'
+    '{$v.name}'
     {if $k - 1 != count($list)}
     ,
     {/if}
-                {/foreach}
-            ],
+        {/foreach}
+        ],
 
             btnkg:0,
 
 
-            fenlei:[],
+                fenlei:[],
             showPicker: false,
 
             value:'{if isset($list[0]['name'])}{$list[0]['name']}{/if}',
@@ -423,7 +424,7 @@
         }else{
             vm.btnkg=1
         }
-
+        console.log(value1)
 
         $.ajax({
             url:IPurl,

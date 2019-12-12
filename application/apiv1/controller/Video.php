@@ -351,7 +351,7 @@ class Video extends Base
                 ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                 ->field('user.avatar_url,user.nickname,user.id user_id')
                 ->where('video.like_sum','>',20)
-                ->order('video.see_sum', 'desc')
+                ->order('video.create_time', 'desc')
                 ->limit($start, $length)
                 ->select()->toArray();
         }else{
@@ -362,8 +362,8 @@ class Video extends Base
                         ->join('user user', 'user.id = video.user_id')
                         ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                         ->field('user.avatar_url,user.nickname,user.id user_id')
-                        ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
-                        ->order('like_sum', 'desc')
+//                        ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
+                        ->order('video.create_time', 'desc')
                         ->limit($start, $length)
                         ->select()->toArray();
                     break;
@@ -377,8 +377,8 @@ class Video extends Base
                         ->field('video.see_sum,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                         ->field('user.avatar_url,user.nickname,user.id user_id')
                         ->whereIn('video.user_id', $focusUserIds)
-                        ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
-                        ->order('like_sum', 'desc')
+//                        ->where('video.create_time', '>', time() - 60 * 60 * 24 * 7)
+                        ->order('video.create_time', 'desc')
                         ->limit($start, $length)
                         ->select()->toArray();
                     break;
@@ -457,8 +457,18 @@ class Video extends Base
         //判断用户是否能够发布
         $authType = $this->getConfig('take_video_auth');
 
-        if ($authType != 0 && $user->authType != $authType) {
-            return json(['code' => 0, 'msg' => '您无权发布视频']);
+        $name = '';
+
+        if ($authType == 3 && $user->authType == 0){
+            $name = '教师和机构';
+        }else if ($authType == 1 && $user->authType != 1){
+            $name = '教师';
+        }else if ($authType == 2 && $user->authType != 2){
+            $name = '机构';
+        }
+
+        if ($name){
+            return json(['code' => 0, 'msg' => '仅限'.$name.'发布视频']);
         }
 
         $post = $request->post();
@@ -648,6 +658,7 @@ class Video extends Base
                     ->field('video.see_sum,video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->field('both.create_time focus,history1.create_time is_like,history2.create_time is_collect')
+                    ->order('video.create_time','desc')
                     ->limit($start, $length)->select()->toArray();
                 break;
             case 2:
@@ -663,6 +674,7 @@ class Video extends Base
                     ->field('video.see_sum,video.source_url,video.video_pic,video.id video_id,video.title,video.ok_sum,video.no_sum,video.like_sum,video.comment_sum,video.share_sum')
                     ->field('user.avatar_url,user.nickname,user.id user_id')
                     ->field('both.create_time focus,history1.create_time is_like,history2.create_time is_collect')
+                    ->order('video.create_time','desc')
                     ->limit($start, $length)->select()->toArray();
                 break;
         }

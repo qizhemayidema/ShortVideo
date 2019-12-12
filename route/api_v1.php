@@ -93,6 +93,8 @@ Route::group(['prefix'=>'api'.$version.'/'],function(){
             Route::get('beComment','User/beCommentList');
             //获取消息数量
             Route::get('msgNum','User/getMsgNum');
+            //课程
+            Route::get('class','User/class');
 
             Route::group('phone',function(){
                 //获取手机验证码

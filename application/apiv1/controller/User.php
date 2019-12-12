@@ -598,6 +598,16 @@ class User extends Base
             $return['focus'] = null;
         }
 
+        if($user->phone){
+            $return['class_sum'] = count($this->class()->getData()['data']);
+        }else{
+            $return['class_sum'] = 0;
+        }
+
+        $return['works_sum'] = (new VideoModel())->where(['status'=>2,'delete_time'=>0,'user_id'=>$return['user_id']])->count();
+
+        $return['collect_sum'] = $history->where(['type'=>$collectTypeCode->getType(),'user_id'=>$return['user_id']])->count();
+
         return json(['code'=>1,'msg'=>'success','data'=>$return]);
     }
 
@@ -886,15 +896,17 @@ class User extends Base
         //判断用户是否能够发布
         $authType = $this->getConfig('take_video_auth');
 
+        $name = '';
 
+        if ($authType == 3 && $user->authType == 0){
+            $name = '教师和机构';
+        }else if ($authType == 1 && $user->authType != 1){
+            $name = '教师';
+        }else if ($authType == 2 && $user->authType != 2){
+            $name = '机构';
+        }
 
-        if ($authType != 0 && $user->authType != $authType) {
-            $name = '';
-            if ($authType == 1){
-                $name = '教师';
-            }elseif ($authType == 2){
-                $name = '机构';
-            }
+        if ($name){
             return json(['code' => 0, 'msg' => '仅限'.$name.'发布视频']);
         }
 
@@ -941,5 +953,40 @@ class User extends Base
         } catch (ServerException $e) {
             return ['status'=>0,'msg'=>$e->getErrorMessage()];
         }
+    }
+
+    public function class()
+    {
+        $userId = \request()->get('user_id');
+
+        $user = (new UserModel())->find($userId);
+
+        $phone = $user['phone'];
+
+        if (!$phone){
+            return json(['code'=>1,'msg'=>'success','data'=>[]]);
+        }
+
+        $dsn = env('MYSQLTWO.DSN');
+
+        $username = env('MYSQLTWO.USERNAME');
+
+        $pwd = env('MYSQLTWO.PASSWORD');
+
+        $pdo = new \PDO($dsn,$username,$pwd);
+
+        $obj = $pdo->prepare("SELECT id,`kecheng_name`,`money`,`start_time`,`image`,
+                                `num`,`yuan_price`,`zhekou`,`quotas`,`gw_id`,`keshi`
+                                FROM `whatsns_kecheng` WHERE uid = (
+                                SELECT uid FROM `whatsns_user` WHERE phone = :phone
+                                ) AND is_shenhe=2 AND STATUS=1 AND `is_delete`=2");
+
+        $obj->bindParam(':phone',$phone, \PDO::PARAM_STR,11);
+
+        $obj->execute();
+
+        $result = $obj->fetchALL(\PDO::FETCH_ASSOC);
+
+        return json(['code'=>1,'msg'=>'success','data'=>$result]);
     }
 }

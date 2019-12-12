@@ -40,6 +40,7 @@ class Base extends Controller
         // TODO: Implement __get() method.
         if ($name == 'userInfo') {
             if (!$this->$name) {
+                http_response_code(401);
                 header('Content-type: application/json');
                 exit(json_encode(['code' => 0, 'msg' => '请先登录账号~'], 256));
 
